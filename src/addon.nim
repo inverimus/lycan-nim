@@ -431,12 +431,14 @@ proc update(addon: Addon) {.gcsafe.} =
     addon.setAddonState(FinishedUpToDate)
 
 proc install(addon: Addon) {.gcsafe.} =
+  # need to list versions for curse here and let user choose
   let json = addon.extractJson()
   addon.setAddonState(Parsing)
   addon.setVersion(json)
 
   addon.time = now()
   
+  # need to list versions for github here and let user choose
   addon.setDownloadUrl(json)
   addon.setName(json)
   addon.setAddonState(Downloading)
