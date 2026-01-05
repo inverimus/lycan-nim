@@ -146,10 +146,6 @@ proc setup(args: seq[string]) =
   for i in 0 ..< len(args) - 1:
     let item = args[i]
     case item:
-    of "path":
-      setPath(args[i + 1]); break
-    of "m", "mode":
-      setMode(args[i + 1]); break
     of "backup":
       setBackup(args[i + 1]); break
     of "github":
@@ -193,8 +189,8 @@ proc processLog() =
 
 
 
-proc main() =
-  configData = loadConfig(basic = true)
+proc main() {.inline.} =
+  configData = loadConfig()
   logInit(configData.logLevel)
   var opt = initOptParser(
     commandLineParams(), 
