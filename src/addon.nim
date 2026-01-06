@@ -208,7 +208,7 @@ proc chooseDownload(addon: Addon, json: JsonNode) =
   of Github:
     let assets = json["assets"]
     var options: seq[(int, string)]
-    for asset in enumerate(assets):
+    for (i, asset) in enumerate(assets):
       if asset["content_type"].getStr() != "application/zip":
         continue
       let name = asset["name"].getStr().toLower()
