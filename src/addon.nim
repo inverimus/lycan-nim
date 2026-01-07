@@ -162,17 +162,35 @@ proc setDownloadUrl(addon: Addon, json: JsonNode) {.gcsafe.} =
     addon.downloadUrl = &"https://www.curseforge.com/api/v1/mods/{addon.project}/files/{id}/download"
   of Github:
     let assets = json["assets"]
+    # if gameVersion is zipball, use the zipball_url
+    if addon.gameVersion == "zipball":
+      addon.downloadUrl = json["zipball_url"].getStr()
+      return
+    # If gameVersion is empty, choose the shortest zip file
+    if addon.gameVersion.isEmptyOrWhitespace:
+      let names = collect(
+        for (i, asset) in enumerate(assets):
+          if asset["content_type"].getStr() != "application/zip":
+            continue
+          (i, asset["name"].getStr())
+      )
+      var shortest = names[0]
+      for name in names[1..^1]:
+        if name[1].len < shortest[1].len:
+          shortest = name
+      addon.downloadUrl = assets[shortest[0]]["browser_download_url"].getStr()
+      return
+    # if gameVersion is not empty, choose the zip file that contains it
     for asset in assets:
       if asset["content_type"].getStr() != "application/zip":
         continue
-      let name = asset["name"].getStr().toLower()
+      let name = asset["name"].getStr()
       if name.contains(addon.gameVersion):
         addon.downloadUrl = asset["browser_download_url"].getStr()
         return
+    # if no zip file contains the gameVersion and it is not empty, we fail and ask the user to reinstall
     if not addon.gameVersion.isEmptyOrWhitespace:
-      addon.setAddonState(Failed, &"No matching zip file matching: {addon.gameVersion}. Try reinstalling.", &"{addon.getName()}: no matching zip file for current game version.")
-    else:
-      addon.downloadUrl = json["zipball_url"].getStr()
+      addon.setAddonState(Failed, &"No matching zip file matching: {addon.gameVersion}. Try reinstalling as file names might have changed.", &"{addon.getName()}: no matching zip file for {addon.gameVersion}.")
   of GithubRepo:
     addon.downloadUrl = &"https://www.github.com/{addon.project}/archive/refs/heads/{addon.branch.get}.zip"
   of Gitlab:
@@ -187,7 +205,7 @@ proc setDownloadUrl(addon: Addon, json: JsonNode) {.gcsafe.} =
 proc userSelect(addon: Addon, options: seq[string]): int {.gcsafe.} =
   let t = addon.config.term
   var selected = 1
-  for _ in 0 .. options.len:
+  for _ in 0 ..< options.len:
     t.addLine()
 
   while true:
@@ -207,49 +225,55 @@ proc userSelect(addon: Addon, options: seq[string]): int {.gcsafe.} =
         for i in 0 .. options.len:
           t.write(16, addon.line + i + 1, true, resetStyle)
         return selected - 1
+    of '\r':
+      return selected - 1
     else:
       discard
 
 proc findCommonPrefix(strings: seq[string]): string =
-  if strings.len == 0: return ""
-  result = strings[0]
+  var shortest = strings[0]
   for s in strings[1..^1]:
-    while not s.startsWith(result) and result.len > 0:
-      result = result[0..^2]
+    if s.len < shortest.len:
+      shortest = s
+  for i in 1 .. shortest.len:
+    let prefix = shortest[0 .. i]
+    if strings.any(s => not s.startsWith(prefix)):
+      return prefix[0 .. i - 1]
 
 proc findCommonSuffix(strings: seq[string]): string =
-  if strings.len == 0: return ""
-  result = strings[0]
+  var longest = strings[0]
   for s in strings[1..^1]:
-    while not s.endsWith(result) and result.len > 0:
-      result = result[1..^1]
+    if s.len > longest.len:
+      longest = s
+  for i in 2 .. longest.len:
+    let suffix = longest[^i .. ^1]
+    if strings.any(s => not s.endsWith(suffix)):
+      return suffix[^(i - 1) .. ^1]
 
-proc extractVersionFromDifferences(filenames: seq[string], selectedIndex: int): string =
-  if filenames.len <= 1: return "unknown"
+proc extractVersionFromDifferences(names: seq[string], selectedIndex: int): string =
+  let commonPrefix = findCommonPrefix(names)
+  let commonSuffix = findCommonSuffix(names)
   
-  let commonPrefix = findCommonPrefix(filenames)
-  let commonSuffix = findCommonSuffix(filenames)
-  
-  # Extract the part that's different for the selected file
-  var selected = filenames[selectedIndex]
-  if selected.startsWith(commonPrefix):
-    selected = selected[commonPrefix.len..^1]
-  if selected.endsWith(commonSuffix):
-    selected = selected[0..^(commonSuffix.len + 1)]
+  let selected = names[selectedIndex]
+  let version = selected[commonPrefix.len .. selected.len - commonSuffix.len - 1]
+  result = version.strip(chars = {'-', '.', '_', ' '})
 
 proc chooseDownload(addon: Addon, json: JsonNode) =
   if addon.state == Failed: return
   case addon.kind
+  of GithubRepo, Curse, Gitlab, Tukui, Wowint:
+    addon.setDownloadUrl(json)
   of Github:
     let assets = json["assets"]
     var options: seq[string]
     for asset in assets:
       if asset["content_type"].getStr() != "application/zip":
         continue
-      let name = asset["name"].getStr().toLower()
+      let name = asset["name"].getStr()
       options.add(name)
     case options.len
     of 0:
+      addon.gameVersion = "zipball"
       addon.downloadUrl = json["zipball_url"].getStr()
       return
     of 1:
@@ -258,10 +282,8 @@ proc chooseDownload(addon: Addon, json: JsonNode) =
     else:
       let i = addon.userSelect(options)
       addon.gameVersion = extractVersionFromDifferences(options, i)
-      echo addon.gameVersion
+      # addon.config.term.write(10, addon.line + 1, false, &"DEBUG gameVersion: {addon.gameVersion}")
       addon.downloadUrl = assets[i]["browser_download_url"].getStr()
-  of GithubRepo, Curse, Gitlab, Tukui, Wowint:
-    addon.setDownloadUrl(json)
 
 proc download(addon: Addon, json: JsonNode) {.gcsafe.} =
   if addon.state == Failed: return
