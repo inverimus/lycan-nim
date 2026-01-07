@@ -1,5 +1,6 @@
 import std/algorithm
 import std/enumerate
+import std/sets
 import std/httpclient
 import std/[json, jsonutils]
 import std/options
@@ -272,7 +273,6 @@ proc chooseDownload(addon: Addon, json: JsonNode) =
     else:
       let i = addon.userSelect(options)
       addon.gameVersion = extractVersionFromDifferences(options, i)
-      # addon.config.term.write(10, addon.line + 1, false, &"DEBUG gameVersion: {addon.gameVersion}")
       addon.downloadUrl = assets[i]["browser_download_url"].getStr()
 
 proc download(addon: Addon, json: JsonNode) {.gcsafe.} =
@@ -515,14 +515,26 @@ proc chooseJson(addon: Addon): JsonNode =
     addon.setAddonState(Failed, "JSON parsing error.", &"{addon.getName()}: JSON parsing error", e)
   case addon.kind:
   of Curse:
-    var gameVersions: seq[string]
-    for i, node in enumerate(json["data"]):
-      gameVersions.fromJson(node["gameVersions"])
-      for version in gameVersions:
-        if version == addon.gameVersion:
-          return json["data"][i]
-    addon.setAddonState(Failed, &"JSON Error: No game version matches current verion of {addon.gameVersion}.",
-      &"JSON Error: {addon.getName()}: no game version matches current mode of {addon.gameVersion}.")
+    var gameVersions: HashSet[string]
+    for data in json["data"]:
+      var tmp: seq[string]
+      tmp.fromJson(data["gameVersions"])
+      gameVersions.incl(tmp.toHashSet())
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   of Tukui:
     for node in json:
       if node["slug"].getStr() == addon.project:
@@ -555,12 +567,10 @@ proc update(addon: Addon) {.gcsafe.} =
     addon.setAddonState(FinishedUpToDate)
 
 proc install(addon: Addon) {.gcsafe.} =
-  # need to list versions for curse and let user choose
   let json = addon.chooseJson()
   addon.setAddonState(Parsing)
   addon.chooseDownload(json)
   addon.setVersion(json)
-
   addon.time = now()
   addon.setName(json)
   addon.setAddonState(Downloading)

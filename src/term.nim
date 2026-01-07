@@ -1,9 +1,9 @@
 import std/colors
 import std/exitprocs
-import std/terminal
 import std/macros
 import std/os
 import std/strutils
+import std/terminal
 
 import types
 
