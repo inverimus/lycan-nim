@@ -207,28 +207,18 @@ proc userSelect(addon: Addon, options: seq[string]): int {.gcsafe.} =
   var selected = 1
   for _ in 0 ..< options.len:
     t.addLine()
-
   while true:
     for (i, option) in enumerate(options):
       if selected == i + 1:
         t.write(16, addon.line + i + 1, false, bgWhite, fgBlack, &"{i + 1}: {option}", resetStyle)
       else:
         t.write(16, addon.line + i + 1, false, bgBlack, fgWhite, &"{i + 1}: {option}", resetStyle)
-    let key = getch()
-    case key
-    of '1' .. '9':
-      var lastSelected = selected
-      let n = parseInt($key)
-      if n < options.len + 1 and n >= 1:
-        selected = n
-      if selected == lastSelected:
-        for i in 0 .. options.len:
-          t.write(16, addon.line + i + 1, true, resetStyle)
-        return selected - 1
-    of '\r':
-      return selected - 1
-    else:
-      discard
+    let newSelected = t.handleSelection(options.len, selected)
+    if newSelected == selected:
+      t.clear(addon.line .. addon.line + options.len)
+      return selected
+    elif newSelected != -1:
+      selected = newSelected
 
 proc findCommonPrefix(strings: seq[string]): string =
   var shortest = strings[0]

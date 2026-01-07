@@ -3,8 +3,66 @@ import std/exitprocs
 import std/terminal
 import std/macros
 import std/os
+import std/strutils
 
 import types
+
+proc handleSelection*(t: Term, length, selected: int): int =
+  # returns -1 if key does nothing
+  let key = getch()
+  case key
+  of '1' .. '9':
+    let n = parseInt($key)
+    if n < length + 1 and n >= 1:
+      return n
+    else:
+      return -1
+  of '\r':    
+    result = selected
+  # handle arrow keys on windows
+  of '\xE0':
+    when not defined(windows):
+      return -1
+    else:
+      let next = getch()
+      case next
+      of 'H':
+        if selected > 1:
+          return selected - 1
+        else:
+          return -1
+      of 'P':
+        if selected < length:
+          return selected + 1
+        else:
+          return -1
+      else:
+        return -1
+  # handle arrow keys on linux/macos
+  of '\x1B':
+    when defined(windows):
+      return -1
+    else:
+      let next = getch()
+      if next != '[':
+        return -1
+      else:
+        let next = getch()
+        case next
+        of 'A':
+          if selected > 1:
+            return selected - 1
+          else:
+            return -1
+        of 'B':
+          if selected < length:
+            return selected + 1
+          else:
+            return -1
+        else:
+          return -1
+  else:
+    return -1
 
 proc moveTo(t: Term, x, y: int, erase: bool) =
   let yOffset = t.y - y
@@ -67,6 +125,10 @@ proc exitTerm(t: Term): proc() =
 
 proc addLine*(t: Term) =
   t.write(0, t.yMax, false, "\n")
+
+proc clear*(t: Term, range: HSlice[int, int]) =
+  for line in range:
+    t.moveTo(0, line, true)
 
 proc termInit*(f: File = stdout): Term =
   enableTrueColors()
