@@ -96,14 +96,7 @@ proc loadConfig*(): Config =
   try:
     configJson = readFile(configPath).parseJson()
   except:
-    result.logLevel = Debug
-    result.addonJsonFile = getCurrentDir() / "WTF" / "lycan_addons.json"
-    result.installDir = getCurrentDir() / "Interface" / "AddOns"
-    result.backupEnabled = true
-    result.backupDir = getCurrentDir() / "Interface" / "lycan_backup"
-    result.githubToken = ""
-    result.addons = @[]
-    writeConfig(result)
+    result = defaultConfig()
     log(&"{configPath} not found, defaults loaded", Info)
     return
 
