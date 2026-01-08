@@ -1,6 +1,9 @@
 import std/options
 import std/times
 
+const RETAIL_VERSION* = "12.0"
+const POLLRATE* = 20
+
 type
   Action* = enum
     Install, Update, Remove, List, Pin, Unpin, Restore, Setup, Empty, Help, Name, Export, Reinstall

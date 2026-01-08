@@ -28,8 +28,6 @@ import types
 import logger
 import messages
 
-const pollRate = 20
-
 proc validId(id: string, kind: AddonKind): bool =
   case kind
   of Curse, Wowint:
@@ -359,7 +357,7 @@ proc main() {.inline.} =
       runningCount += int(t.running)
     if runningCount == 0:
       break
-    sleep(pollRate)
+    sleep(POLLRATE)
 
   processLog()
   processed &= processMessages()
