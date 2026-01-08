@@ -10,6 +10,5 @@ bin           = @["lycan"]
 
 # Dependencies
 
-requires "nim >= 1.7.3"
-requires "zip >= 0.10.4"
-requires "https://github.com/inverimus/webdriver"
+requires "nim >= 2.2.6"
+requires "zippy >= 0.10.6"
