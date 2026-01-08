@@ -88,10 +88,6 @@ proc defaultConfig(): Config =
   writeConfig(result)
 
 proc loadConfig*(): Config =
-  result = Config()
-  result.tempDir = getTempDir()
-  result.term = termInit()
-  
   var configJson: JsonNode
   try:
     configJson = readFile(configPath).parseJson()
@@ -99,7 +95,10 @@ proc loadConfig*(): Config =
     result = defaultConfig()
     log(&"{configPath} not found, defaults loaded", Info)
     return
-
+  
+  result = Config()
+  result.tempDir = getTempDir()
+  result.term = termInit()
   result.logLevel = parseEnum[LogLevel](configJson["logLevel"].getStr())
   result.addonJsonFile = configJson["addonJsonFile"].getStr()
   result.installDir = configJson["installDir"].getStr()
