@@ -487,13 +487,16 @@ proc extractJson(addon: Addon): JsonNode {.gcsafe.} =
     addon.setAddonState(Failed, "JSON parsing error.", &"{addon.getName()}: JSON parsing error", e)
   case addon.kind:
   of Curse:
-    let gameVersion = if addon.gameVersion == "Retail": RETAIL_VERSION else: addon.gameVersion
     var gameVersions: seq[string]
-    for (i, data) in enumerate(json["data"]):
+    for data in json["data"]:
       gameVersions.fromJson(data["gameVersions"])
       for version in gameVersions:
-        if version.rsplit(".", maxSplit = 1)[0] == gameVersion:
-          return json["data"][i]
+        if addon.gameVersion == "Retail":
+          if version.split(".")[0] == RETAIL_VERSION:
+            return data
+        else:
+          if version.rsplit(".", maxSplit = 1)[0] == addon.gameVersion:
+            return data
     addon.setAddonState(Failed, &"JSON Error: No game version matches current verion of {addon.gameVersion}.", 
       &"JSON Error: {addon.getName()}: no game version matches current mode of {addon.gameVersion}.")
   of Tukui:
@@ -604,13 +607,15 @@ proc chooseJson(addon: Addon): JsonNode =
     gameVersions.insert("Retail", 0)
     var selectedVersion = addon.userSelectGameVersionCurse(gameVersions)
     addon.gameVersion = selectedVersion
-    if selectedVersion == "Retail":
-      selectedVersion = RETAIL_VERSION
     for data in json["data"]:
       var tmp: seq[string]
       tmp.fromJson(data["gameVersions"])
-      if tmp.anyIt(it.rsplit(".", maxSplit = 1)[0] == selectedVersion):
-        return data
+      if selectedVersion == "Retail":
+        if tmp.anyIt(it.split(".")[0] == RETAIL_VERSION):
+          return data
+      else:
+        if tmp.anyIt(it.rsplit(".", maxSplit = 1)[0] == selectedVersion):
+          return data
   of Tukui:
     for node in json:
       if node["slug"].getStr() == addon.project:
