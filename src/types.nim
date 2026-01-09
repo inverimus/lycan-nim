@@ -58,20 +58,17 @@ type
     backupEnabled*: bool
     backupDir*: string
     addonJsonFile*: string
-    addons*: seq[Addon]
+    addons*: seq[AddonBase]
     term*: Term
     local*: bool
     githubToken*: string
     logLevel*: LogLevel
 
-  Addon* = ref object
+  AddonBase* = ref object of RootObj
     action*: Action
     state*: AddonState
-    project*: string
-    branch*: Option[string]
     name*: string
     overrideName*: Option[string]
-    kind*: AddonKind
     version*: string
     startVersion*: string
     gameVersion*: string
@@ -85,6 +82,30 @@ type
     time*: DateTime
     config*: ptr Config
     errorMsg*: string
+
+  AddonGithub* = ref object of AddonBase
+    owner*: string
+    repo*: string
+
+  AddonGithubRepo* = ref object of AddonBase
+    owner*: string
+    repo*: string
+    branch*: string
+
+  AddonGitlab* = ref object of AddonBase
+    owner*: string
+    repo*: string
+  
+  AddonTukui* = ref object of AddonBase
+    project*: string
+  
+  AddonWowint* = ref object of AddonBase
+    projectId*: string
+  
+  AddonCurse* = ref object of AddonBase
+    curseId*: string
+
+  Addon* = AddonGithub | AddonGithubRepo | AddonGitlab | AddonTukui | AddonWowint | AddonCurse
 
   Term* = ref object
     f*: File
