@@ -9,7 +9,7 @@ import term
 import logger
 
 var configData*: Config
-var addonChannel*: Channel[Addon]
+var addonChannel*: Channel[AddonBase]
 
 proc fromJsonHook(a: var Addon, j: JsonNode) =
   var
@@ -41,7 +41,7 @@ proc fromJsonHook(a: var Addon, j: JsonNode) =
   a.pinned = j["pinned"].getBool()
   a.time = parse(j["time"].getStr(), "yyyy-MM-dd'T'HH:mm")
 
-proc parseInstalledAddons(filename: string): seq[Addon] =
+proc parseInstalledAddons(filename: string): seq[AddonBase] =
   if not fileExists(filename): return @[]
   var addonsJson: JsonNode
   try:
@@ -51,7 +51,7 @@ proc parseInstalledAddons(filename: string): seq[Addon] =
     log(&"Fatal error parsing installed addons file: {filename}", Fatal, e)
     quit(1)
   for addon in addonsJson:
-    var a = new(Addon)
+    var a = new(AddonBase)
     a.fromJson(addon)
     result.add(a)
 

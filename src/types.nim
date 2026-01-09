@@ -97,7 +97,7 @@ type
     repo*: string
   
   AddonTukui* = ref object of AddonBase
-    project*: string
+    slug*: string
   
   AddonWowint* = ref object of AddonBase
     projectId*: string

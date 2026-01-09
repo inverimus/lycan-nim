@@ -20,7 +20,7 @@ import std/sugar
 import std/terminal
 import std/times
 
-import addon
+import addonBase
 import config
 import help
 import term
@@ -44,7 +44,7 @@ proc validId(id: string, kind: AddonKind): bool =
     discard
   return false
 
-proc addonFromUrl(url: string): Option[Addon] =
+proc addonFromUrl(url: string): AddonBase =
   var urlmatch: array[2, string]
   let pattern = re"^(?:https?://)?(?:www\.)?(.+)\.(?:com|org)/(.+[^/\n])"
   let found = find(cstring(url), pattern, urlmatch, 0, len(url))
@@ -60,39 +60,39 @@ proc addonFromUrl(url: string): Option[Addon] =
         echo &"Make sure you have the corret URL. Go to the addon page, click download, and copy the 'try again' link."
       else:
         if validId(m[0], Curse):
-          return some(newAddon(m[0], Curse))
+          return newAddonCurse(m[0])
     of "github":
       let p = re"^(.+?/.+?)(?:/|$)(?:tree/)?(.+)?"
       var m: array[2, string]
       discard find(cstring(urlmatch[1]), p, m, 0, len(urlmatch[1]))
       if validId(m[0], Github):
         if m[1] == "":
-          return some(newAddon(m[0], Github))
+          return newAddonGithub(m[0], m[1])
         else:
-          return some(newAddon(m[0], GithubRepo, branch = some(m[1])))
+          return newAddonGithubRepo(m[0], m[1], m[2])
     of "gitlab":
       if validId(urlmatch[1], Gitlab):
-        return some(newAddon(urlmatch[1], Gitlab))
+        return newAddonGitlab(urlmatch[1], "")
     of "tukui":
       if validId(urlmatch[1], Tukui):
-        return some(newAddon(urlmatch[1], Tukui))
+        return newAddonTukui(urlmatch[1])
     of "wowinterface":
       let p = re"^downloads\/info(\d+)-?"
       var m: array[1, string]
       discard find(cstring(urlmatch[1]), p, m, 0, len(urlmatch[1]))
       if validId(m[0], Wowint):
-        return some(newAddon(m[0], Wowint))
+        return newAddonWowint(m[0])
     else:
       discard
-  return none(Addon)
+  return nil
 
-proc addonFromProject(s: string): Option[Addon] =
+proc addonFromProject(s: string): AddonBase =
   var match: array[2, string]
   let pattern = re"^([^:]+):(.*)$"
   let found = find(cstring(s), pattern, match, 0, len(s))
   if found == -1:
     echo &"Unable to determine addon from {s}."
-    return none(Addon)
+    return nil
   let source = match[0].toLower()
   let id = match[1].toLower()
   case source
@@ -119,7 +119,7 @@ proc addonFromProject(s: string): Option[Addon] =
         return some(newAddon(match[0], GithubRepo, branch = some(match[1])))
   else: 
     discard
-  return none(Addon)
+  return nil
 
 proc parseAddon(s: string): Option[Addon] =
   var match: array[2, string]

@@ -24,12 +24,12 @@ proc getVersion*(addon: Addon): string =
       return addon.startVersion
     return addon.version
 
-proc getName*(addon: Addon): string =
-  if addon.overrideName.isSome: 
-    return addon.overrideName.get
-  if addon.name.isEmptyOrWhitespace:
-    return $addon.kind & ':' & addon.project
-  return addon.name
+# proc getName*(addon: Addon): string =
+#   if addon.overrideName.isSome:
+#     return addon.overrideName.get
+#   if addon.name.isEmptyOrWhitespace:
+#     return $addon.kind & ':' & addon.project
+#   return addon.name
 
 proc stateMessage*(addon: Addon, nameSpace, versionSpace: int) = 
   case addon.state
