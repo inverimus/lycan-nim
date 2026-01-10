@@ -248,9 +248,10 @@ proc main() {.inline.} =
     ids: seq[int16]
   case action
   of Install:
+    log("Installing addons...")
     var addonStrings: seq[string]
     var f: File
-    if f.open(args[0]):
+    if args.len > 0 and f.open(args[0]):
       while true:
         try: addonStrings.add(f.readline())
         except: break
