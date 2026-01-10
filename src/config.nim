@@ -73,7 +73,8 @@ proc writeConfig*(config: Config) =
 
 proc loadConfig*(): Config =
   result = Config()
-  result.tempDir = getTempDir()
+  result.tempDir = getTempDir() / "lycan"
+  createDir(result.tempDir)
   result.term = termInit()
   result.addonJsonFile = getCurrentDir() / "WTF" / "lycan_addons.json"
   result.installDir = getCurrentDir() / "Interface" / "AddOns"
