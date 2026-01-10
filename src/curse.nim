@@ -20,7 +20,7 @@ proc versionCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
   try:
     result = json["displayName"].getStr()
     if result.endsWith(".zip"):
-      result = json["dateModified"].getStr()  
+      result = json["dateModified"].getStr()
   except KeyError:
     result = json["dateModified"].getStr()
 
