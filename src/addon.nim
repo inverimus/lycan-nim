@@ -18,6 +18,7 @@ import files
 
 import github
 import curse
+import wago
 
 proc `==`*(a, b: Addon): bool {.inline.} =
   a.project.toLower() == b.project.toLower()
@@ -107,7 +108,11 @@ proc setDownloadUrl(addon: Addon, json: JsonNode) {.gcsafe.} =
   of Wowint:
     addon.downloadUrl = json[0]["UIDownload"].getStr()
   of Wago:
-    addon.downloadUrl = json["props"]["releases"]["data"][0]["download_link"].getStr()
+    if addon.action == Install:
+      addon.chooseDownloadUrlWago(json)
+    else:
+      # addon.downloadUrl = json["props"]["releases"]["data"][0]["download_link"].getStr()
+      addon.setDownloadUrlWago(json)
 
 proc getLatest(addon: Addon): Response {.gcsafe.} =
   addon.setAddonState(Checking, &"Checking: {addon.getName()} getting latest version information")

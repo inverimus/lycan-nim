@@ -34,7 +34,7 @@ proc extractJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
       if version.rsplit(".", maxSplit = 1)[0] == addon.gameVersion:
         return data
   addon.setAddonState(Failed, &"JSON Error: No game version matches current verion of {addon.gameVersion}.", 
-    &"JSON Error: {addon.getName()}: no game version matches current mode of {addon.gameVersion}.")
+    &"JSON Error: {addon.getName()}: no game version matches current version of {addon.gameVersion}.")
   return
 
 proc getVersionName(majorVersion, minorVersion: int): string =
@@ -132,7 +132,11 @@ proc chooseJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
         gameVersionsSet.incl(&"{major}.{minor}")
   var gameVersions = gameVersionsSet.toSeq()
   gameVersions.insert("Retail", 0)
-  var selectedVersion = addon.userSelectGameVersion(gameVersions)
+  var selectedVersion: string
+  if gameVersions.len == 1:
+    selectedVersion = gameVersions[0]
+  else:
+    selectedVersion = addon.userSelectGameVersion(gameVersions)
   addon.gameVersion = selectedVersion
   if selectedVersion == "Retail":
     return json["data"][0]
