@@ -39,6 +39,59 @@ proc extractJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
     &"JSON Error: {addon.getName()}: no game version matches current mode of {addon.gameVersion}.")
   return
 
+proc getVersionName(majorVersion, minorVersion: int): string =
+  case majorVersion
+  of 12:
+    case minorVersion
+    of 0..2: result = "Midnight"
+    else: result = "Midnight Classic"
+  of 11:
+    case minorVersion
+    of 0..2: result = "The War Within"
+    else: result = "TWW Classic"
+  of 10:
+    case minorVersion
+    of 0..2: result = "Dragonflight"
+    else: result = "Dragonflight Classic"
+  of 9:
+    case minorVersion
+    of 0..2: result = "Shadowlands"
+    else: result = "Shadowlands Classic"
+  of 8:
+    case minorVersion
+    of 0..3: result = "Battle for Azeroth"
+    else: result = "BfA Classic"
+  of 7:
+    case minorVersion
+    of 0..3: result = "Legion"
+    else: result = "Legion Classic"
+  of 6:
+    case minorVersion
+    of 0..2: result = "Warlords of Draenor"
+    else: result = "WoD Classic"
+  of 5:
+    case minorVersion
+    of 0..4: result = "Mists of Pandaria"
+    else: result = "MoP Classic"
+  of 4:
+    case minorVersion
+    of 0..3: result = "Cataclysm"
+    else: result = "Cataclysm Classic"
+  of 3:
+    case minorVersion
+    of 0..3: result = "Wrath of the Lich King"
+    else: result = "WotLK Classic"
+  of 2:
+    case minorVersion
+    of 0..4: result = "The Burning Crusade"
+    else: result = "TBC Classic"
+  of 1:
+    case minorVersion
+    of 0..12: result = "Vanilla"
+    else: result = "Classic"
+  else: 
+    result = "Unknown"
+
 proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.} =
   let t = addon.config.term
   var selected = 1
@@ -46,67 +99,18 @@ proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.
     t.addLine()
   while true:
     for (i, option) in enumerate(options):
-      var version: string
+      var versionName: string
       if option == "Retail":
-        version = &"Retail ({RETAIL_VERSION})"
+        versionName = &"Retail"
       else:
         let optionSplit = option.split(".")
         let majorVersion = parseInt(optionSplit[0])
         let minorVersion = parseInt(optionSplit[1])
-        case majorVersion
-        of 12:
-          case minorVersion
-          of 0..2: version = "Midnight"
-          else: version = "Midnight Classic"
-        of 11:
-          case minorVersion
-          of 0..2: version = "The War Within"
-          else: version = "TWW Classic"
-        of 10:
-          case minorVersion
-          of 0..2: version = "Dragonflight"
-          else: version = "Dragonflight Classic"
-        of 9:
-          case minorVersion
-          of 0..2: version = "Shadowlands"
-          else: version = "Shadowlands Classic"
-        of 8:
-          case minorVersion
-          of 0..3: version = "Battle for Azeroth"
-          else: version = "BfA Classic"
-        of 7:
-          case minorVersion
-          of 0..3: version = "Legion"
-          else: version = "Legion Classic"
-        of 6:
-          case minorVersion
-          of 0..2: version = "Warlords of Draenor"
-          else: version = "WoD Classic"
-        of 5:
-          case minorVersion
-          of 0..4: version = "Mists of Pandaria"
-          else: version = "MoP Classic"
-        of 4:
-          case minorVersion
-          of 0..3: version = "Cataclysm"
-          else: version = "Cataclysm Classic"
-        of 3:
-          case minorVersion
-          of 0..3: version = "Wrath of the Lich King"
-          else: version = "WotLK Classic"
-        of 2:
-          case minorVersion
-          of 0..4: version = "The Burning Crusade"
-          else: version = "TBC Classic"
-        of 1:
-          case minorVersion
-          of 0..12: version = "Vanilla"
-          else: version = "Classic"
-        else: discard
+        versionName = getVersionName(majorVersion, minorVersion)
       if selected == i + 1:
-        t.write(16, addon.line + i + 1, false, bgWhite, fgBlack, &"{i + 1}: {version}", resetStyle)
+        t.write(16, addon.line + i + 1, false, bgWhite, fgBlack, &"{i + 1}: {versionName} - {option}", resetStyle)
       else:
-        t.write(16, addon.line + i + 1, false, bgBlack, fgWhite, &"{i + 1}: {version}", resetStyle)
+        t.write(16, addon.line + i + 1, false, bgBlack, fgWhite, &"{i + 1}: {versionName} - {option}", resetStyle)
     let newSelected = handleSelection(options.len, selected)
     if newSelected == selected:
       t.clear(addon.line .. addon.line + options.len)
@@ -123,7 +127,11 @@ proc chooseJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
     var tmp: seq[string]
     tmp.fromJson(data["gameVersions"])
     for item in tmp:
-      gameVersionsSet.incl(item.rsplit(".", maxSplit = 1)[0])
+      let s = item.split(".")
+      let major = s[0]
+      let minor = s[1]
+      if not gameVersionsSet.anyIt(it.split(".")[0] == major):
+        gameVersionsSet.incl(&"{major}.{minor}")
   var gameVersions = gameVersionsSet.toSeq()
   gameVersions.insert("Retail", 0)
   var selectedVersion = addon.userSelectGameVersion(gameVersions)
