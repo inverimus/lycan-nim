@@ -81,10 +81,15 @@ proc setVersion(addon: Addon, json: JsonNode) {.gcsafe.} =
   of Gitlab:
     let v = json[0]["tag_name"].getStr()
     addon.version = if not v.isEmptyOrWhitespace: v else: json[0]["name"].getStr()
-  of Tukui, Wago:
+  of Tukui:
     addon.version = json["version"].getStr()
   of Wowint:
     addon.version = json[0]["UIVersion"].getStr()
+  of Wago:
+    for data in json["props"]["releases"]["data"]:
+      if data["supported_" & addon.gameVersion & "_patches"].len > 0:
+        addon.version = data["label"].getStr()
+        return
 
 proc setDownloadUrl(addon: Addon, json: JsonNode) {.gcsafe.} =
   if addon.state == Failed: return
