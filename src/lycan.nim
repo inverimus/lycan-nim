@@ -5,6 +5,7 @@ https://gitlab.com/woblight/actionmirroringframe
 https://www.wowinterface.com/downloads/info24608-HekiliPriorityHelper.html
 https://www.tukui.org/elvui
 https://www.curseforge.com/api/v1/mods/1592/files/4963354/download
+https://addons.wago.io/addons/rarescanner
 ]#
 
 import std/algorithm
