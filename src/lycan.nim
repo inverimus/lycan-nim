@@ -37,12 +37,11 @@ proc validProject(project: string, kind: AddonKind): bool =
     return project.all(isDigit)
   of Tukui:
     return project == "tukui" or project == "elvui"
-  of Github, Gitlab:
-    var match: array[2, string]
-    let pattern = re"^[^\/]*\/[^\/]*$"
-    let found = find(cstring(project), pattern, match, 0, len(project))
-    if not found == -1:
-      return true
+  of Github:
+    return project.split("/").len == 2
+  of Gitlab:
+    let split = project.split("/")
+    return split.len == 2 or split.len == 3
   of Wago:
     return not project.contains("/")
   else:
