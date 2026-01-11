@@ -117,7 +117,6 @@ proc setDownloadUrl(addon: Addon, json: JsonNode) {.gcsafe.} =
     if addon.action == Install:
       addon.chooseDownloadUrlWago(json)
     else:
-      # addon.downloadUrl = json["props"]["releases"]["data"][0]["download_link"].getStr()
       addon.setDownloadUrlWago(json)
 
 proc getLatest(addon: Addon): Response {.gcsafe.} =

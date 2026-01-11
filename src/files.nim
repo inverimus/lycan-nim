@@ -47,6 +47,7 @@ proc setDownloadFilename(addon: Addon, json: JsonNode, response: Response) {.gcs
   of Wago:
     # The actual filename is included in a 302 redirect which is handled automatically by httpclient. We should be able to
     # make a request with maxRedirects = 0 to get the actual name, but it's not worth the overhead.
+    # Should we just do this for all downloads? Maybe some value in matching manual downloads when possible.
     downloadName = addon.project & ".zip"
   of Curse:
     downloadName = json["fileName"].getStr()

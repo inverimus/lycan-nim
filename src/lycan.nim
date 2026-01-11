@@ -129,6 +129,9 @@ proc addonFromProject(s: string): Option[Addon] =
         return some(newAddon(id, Github))
       else:
         return some(newAddon(match[0], GithubRepo, branch = some(match[1])))
+  of "wago":
+    if validId(id, Wago):
+      return some(newAddon(id, Wago))
   else: 
     discard
   return none(Addon)
@@ -332,15 +335,15 @@ proc main() {.inline.} =
       addons.sort((a, z) => int(a.time < z.time))
     addons.list()
   of Export:
-    let filename = getCurrentDir() / "exported_addons"
-    let f = open(filename, fmWrite)
+    let filename = "lycan_addons"
+    let f = open(getCurrentDir() / filename, fmWrite)
     for addon in configData.addons:
-      let kind = case addon.kind
-      of GithubRepo: "Github"
-      else: $addon.kind
-      var exportName = &"{kind}:{addon.project}"
-      if addon.branch.isSome:
-        exportName &= &"@{addon.branch.get}"
+      var exportName: string
+      case addon.kind
+      of GithubRepo:
+        exportName = &"Github:{addon.project}@{addon.branch.get}"
+      else:
+        exportName = &"{$addon.kind}:{addon.project}"
       echo &"  Exported {addon.getName()}:  {exportName}"
       f.writeLine(exportName)
     f.close()
