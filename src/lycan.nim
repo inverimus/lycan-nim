@@ -10,10 +10,12 @@ https://www.curseforge.com/api/v1/mods/1592/files/4963354/download
 import std/algorithm
 import std/enumerate
 import std/options
-import std/[os, parseopt]
+import std/os
+import std/parseopt
 import std/re
 import std/sequtils
-import std/[strformat, strutils]
+import std/strformat
+import std/strutils
 import std/sugar
 import std/terminal
 import std/times
@@ -145,7 +147,7 @@ proc addonFromId(id: int16): Option[Addon] =
     if a.id == id: return some(a)
   return none(Addon)
 
-proc setup(args: seq[string]) =
+proc changeConfig(args: seq[string]) =
   if len(args) == 0:
     showConfig()
   if len(args) < 2:
@@ -345,7 +347,7 @@ proc main() {.inline.} =
     echo &"    Wrote {configData.addons.len} addons to {filename}"
     quit()
   of Setup:
-    setup(args)
+    changeConfig(args)
   of Help:
     if args.len > 0:
       displayHelp(args[0])

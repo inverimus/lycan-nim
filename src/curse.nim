@@ -1,8 +1,10 @@
 import std/enumerate
 import std/sets
-import std/[json, jsonutils]
+import std/json
+import std/jsonutils
 import std/sequtils
-import std/[strformat, strutils]
+import std/strformat
+import std/strutils
 import std/terminal
 
 import types

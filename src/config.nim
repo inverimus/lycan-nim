@@ -1,7 +1,9 @@
-import std/[json, jsonutils]
+import std/json
+import std/jsonutils
 import std/options
 import std/os
-import std/[strformat, strutils]
+import std/strformat
+import std/strutils
 import std/times
 
 import types

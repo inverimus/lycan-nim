@@ -3,7 +3,8 @@ import std/httpclient
 import std/json
 import std/options
 import std/sequtils
-import std/[strformat, strutils]
+import std/strformat
+import std/strutils
 import std/sugar
 import std/terminal
 

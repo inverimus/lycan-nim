@@ -1,5 +1,6 @@
 import std/options
-import std/[strformat, strutils]
+import std/strformat
+import std/strutils
 
 import config
 import types

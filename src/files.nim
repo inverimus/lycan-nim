@@ -1,10 +1,12 @@
 import std/algorithm
 import std/httpclient
-import std/[json, jsonutils]
+import std/json
+import std/jsonutils
 import std/options
 import std/os
 import std/re
-import std/[strformat, strutils]
+import std/strformat
+import std/strutils
 import std/sugar
 import std/times
 
