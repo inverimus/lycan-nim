@@ -243,12 +243,6 @@ proc main() {.inline.} =
     if actionCount > 1 or (len(args) > 0 and action == Empty):
       displayHelp()
 
-  case action
-  of Help, Setup:
-    discard
-  else:
-    configData = loadConfig()
-
   var
     addons: seq[Addon]
     line = 0
