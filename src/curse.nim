@@ -97,6 +97,8 @@ proc extractJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
   return
 
 proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.} =
+  if options.len == 1:
+    return options[0]
   let t = addon.config.term
   var selected = 1
   for _ in 0 ..< options.len:
@@ -126,10 +128,7 @@ proc chooseJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
       gameVersionsSet.incl(getVersionName(item))
   var gameVersions = gameVersionsSet.toSeq()
   var selectedVersion: string
-  if gameVersions.len == 1:
-    selectedVersion = gameVersions[0]
-  else:
-    selectedVersion = addon.userSelectGameVersion(gameVersions)
+  selectedVersion = addon.userSelectGameVersion(gameVersions)
   addon.gameVersion = selectedVersion
   for data in json["data"]:
     var tmp: seq[string]
