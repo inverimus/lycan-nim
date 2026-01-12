@@ -18,6 +18,7 @@ import addonHelp
 import files
 
 import github
+import gitlab
 import curse
 import wago
 
@@ -106,9 +107,13 @@ proc setDownloadUrl(addon: Addon, json: JsonNode) {.gcsafe.} =
   of GithubRepo:
     addon.downloadUrl = &"https://www.github.com/{addon.project}/archive/refs/heads/{addon.branch.get}.zip"
   of Gitlab:
-    for source in json[0]["assets"]["sources"]:
-      if source["format"].getStr() == "zip":
-        addon.downloadUrl = source["url"].getStr()
+    if addon.action == Install:
+      addon.chooseDownloadUrlGitlab(json)
+    else:
+      addon.setDownloadUrlGitlab(json)
+    # for source in json[0]["assets"]["sources"]:
+    #   if source["format"].getStr() == "zip":
+    #     addon.downloadUrl = source["url"].getStr()
   of Tukui:
     addon.downloadUrl = json["url"].getStr()
   of Wowint:

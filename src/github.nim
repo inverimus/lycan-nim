@@ -2,7 +2,6 @@ import std/enumerate
 import std/httpclient
 import std/json
 import std/options
-import std/sequtils
 import std/strformat
 import std/strutils
 import std/sugar
@@ -23,9 +22,8 @@ proc setDownloadUrlGithub*(addon: Addon, json: JsonNode) {.gcsafe.} =
   if addon.gameVersion.isEmptyOrWhitespace:
     let names = collect(
       for (i, asset) in enumerate(assets):
-        if asset["content_type"].getStr() != "application/zip":
-          continue
-        (i, asset["name"].getStr())
+        if asset["content_type"].getStr() == "application/zip":
+          (i, asset["name"].getStr())
     )
     var shortest = names[0]
     for name in names[1..^1]:
@@ -64,42 +62,13 @@ proc userSelectDownloadGithub(addon: Addon, options: seq[string]): int {.gcsafe.
     elif newSelected != -1:
       selected = newSelected
 
-proc findCommonPrefix(strings: seq[string]): string =
-  var shortest = strings[0]
-  for s in strings[1..^1]:
-    if s.len < shortest.len:
-      shortest = s
-  for i in 1 .. shortest.len:
-    let prefix = shortest[0 .. i]
-    if strings.any(s => not s.startsWith(prefix)):
-      return prefix[0 .. i - 1]
-
-proc findCommonSuffix(strings: seq[string]): string =
-  var longest = strings[0]
-  for s in strings[1..^1]:
-    if s.len > longest.len:
-      longest = s
-  for i in 2 .. longest.len:
-    let suffix = longest[^i .. ^1]
-    if strings.any(s => not s.endsWith(suffix)):
-      return suffix[^(i - 1) .. ^1]
-
-proc extractVersionFromDifferences(names: seq[string], selectedIndex: int): string =
-  let commonPrefix = findCommonPrefix(names)
-  let commonSuffix = findCommonSuffix(names)
-  let selected = names[selectedIndex]
-  let version = selected[commonPrefix.len .. selected.len - commonSuffix.len - 1]
-  result = version.strip(chars = {'-', '.', '_', ' '})
-
 proc chooseDownloadUrlGithub*(addon: Addon, json: JsonNode) {.gcsafe.} =
   if addon.state == Failed: return
   let assets = json["assets"]
   var options: seq[string]
   for asset in assets:
-    if asset["content_type"].getStr() != "application/zip":
-      continue
-    let name = asset["name"].getStr()
-    options.add(name)
+    if asset["content_type"].getStr() == "application/zip":
+      options.add(asset["name"].getStr())
   case options.len
   of 0:
     addon.gameVersion = "zipball"

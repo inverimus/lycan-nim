@@ -1,4 +1,6 @@
 import std/options
+import std/sequtils
+import std/sugar
 import std/strformat
 import std/strutils
 
@@ -79,3 +81,30 @@ proc getLatestUrl*(addon: Addon): string {.gcsafe.} =
     return &"https://api.github.com/repos/{addon.project}/commits/{addon.branch.get}"
   of Wago:
     return &"https://addons.wago.io/addons/{addon.project}/versions?stability=stable"
+
+proc findCommonPrefix(strings: seq[string]): string =
+  var shortest = strings[0]
+  for s in strings[1..^1]:
+    if s.len < shortest.len:
+      shortest = s
+  for i in 1 .. shortest.len:
+    let prefix = shortest[0 .. i]
+    if strings.any(s => not s.startsWith(prefix)):
+      return prefix[0 .. i - 1]
+
+proc findCommonSuffix(strings: seq[string]): string =
+  var longest = strings[0]
+  for s in strings[1..^1]:
+    if s.len > longest.len:
+      longest = s
+  for i in 2 .. longest.len:
+    let suffix = longest[^i .. ^1]
+    if strings.any(s => not s.endsWith(suffix)):
+      return suffix[^(i - 1) .. ^1]
+
+proc extractVersionFromDifferences*(names: seq[string], selectedIndex: int): string =
+  let commonPrefix = findCommonPrefix(names)
+  let commonSuffix = findCommonSuffix(names)
+  let selected = names[selectedIndex]
+  let version = selected[commonPrefix.len .. selected.len - commonSuffix.len - 1]
+  result = version.strip(chars = {'-', '.', '_', ' '})
