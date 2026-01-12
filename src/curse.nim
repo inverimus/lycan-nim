@@ -88,7 +88,7 @@ proc getVersionName(majorVersion, minorVersion: int): string =
   of 1:
     case minorVersion
     of 0..12: result = "Vanilla"
-    else: result = "Classic"
+    else: result = "Classic (Vanilla)"
   else: 
     result = "Unknown"
 
@@ -101,7 +101,7 @@ proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.
     for (i, option) in enumerate(options):
       var versionName: string
       if option == "Retail":
-        versionName = &"Retail"
+        versionName = "Retail"
       else:
         let optionSplit = option.split(".")
         let majorVersion = parseInt(optionSplit[0])
@@ -118,6 +118,16 @@ proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.
     elif newSelected != -1:
       selected = newSelected
 
+proc relevantVersions(version: string): bool =
+  let s = version.split(".")
+  let major = parseInt(s[0])
+  let minor = parseInt(s[1])
+  case major
+  of 11, 12: return true
+  of 5: return minor > 4
+  of 1: return minor > 12
+  else: return false
+  
 proc chooseJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
   if json["data"].len == 0:
     addon.setAddonState(Failed, "Addon not found.", "Addon not found.")
@@ -132,7 +142,7 @@ proc chooseJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
       let minor = s[1]
       if not gameVersionsSet.anyIt(it.split(".")[0] == major):
         gameVersionsSet.incl(&"{major}.{minor}")
-  var gameVersions = gameVersionsSet.toSeq()
+  var gameVersions = gameVersionsSet.toSeq().filter(relevantVersions)
   gameVersions.insert("Retail", 0)
   var selectedVersion: string
   if gameVersions.len == 1:
