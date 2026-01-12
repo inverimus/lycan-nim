@@ -26,28 +26,15 @@ proc versionCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
   except KeyError:
     result = json["dateModified"].getStr()
 
-proc extractJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
-  if addon.gameVersion == "Retail":
-    return json["data"][0]
-  var gameVersions: seq[string]
-  for data in json["data"]:
-    gameVersions.fromJson(data["gameVersions"])
-    for version in gameVersions:  
-      if version.rsplit(".", maxSplit = 1)[0] == addon.gameVersion:
-        return data
-  addon.setAddonState(Failed, &"JSON Error: No game version matches current verion of {addon.gameVersion}.", 
-    &"JSON Error: {addon.getName()}: no game version matches current version of {addon.gameVersion}.")
-  return
-
 proc getVersionName(majorVersion, minorVersion: int): string =
   case majorVersion
   of 12:
     case minorVersion
-    of 0..2: result = "Midnight"
+    of 0..2: result = "Retail"
     else: result = "Midnight Classic"
   of 11:
     case minorVersion
-    of 0..2: result = "The War Within"
+    of 0..2: result = "Retail"
     else: result = "TWW Classic"
   of 10:
     case minorVersion
@@ -92,6 +79,23 @@ proc getVersionName(majorVersion, minorVersion: int): string =
   else: 
     result = "Unknown"
 
+proc getVersionName(version: string): string =
+  let v = version.split(".")
+  let majorVersion = parseInt(v[0])
+  let minorVersion = parseInt(v[1])
+  getVersionName(majorVersion, minorVersion)
+
+proc extractJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
+  var gameVersions: seq[string]
+  for data in json["data"]:
+    gameVersions.fromJson(data["gameVersions"])
+    for version in gameVersions:  
+      if getVersionName(version) == addon.gameVersion:
+        return data
+  addon.setAddonState(Failed, &"JSON Error: No game version matches current verion of {addon.gameVersion}.", 
+    &"JSON Error: {addon.getName()}: no game version matches current version of {addon.gameVersion}.")
+  return
+
 proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.} =
   let t = addon.config.term
   var selected = 1
@@ -99,18 +103,10 @@ proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.
     t.addLine()
   while true:
     for (i, option) in enumerate(options):
-      var versionName: string
-      if option == "Retail":
-        versionName = "Retail"
-      else:
-        let optionSplit = option.split(".")
-        let majorVersion = parseInt(optionSplit[0])
-        let minorVersion = parseInt(optionSplit[1])
-        versionName = getVersionName(majorVersion, minorVersion)
       if selected == i + 1:
-        t.write(16, addon.line + i + 1, false, bgWhite, fgBlack, &"{i + 1}: {versionName}", resetStyle)
+        t.write(16, addon.line + i + 1, false, bgWhite, fgBlack, &"{i + 1}: {option}", resetStyle)
       else:
-        t.write(16, addon.line + i + 1, false, bgBlack, fgWhite, &"{i + 1}: {versionName}", resetStyle)
+        t.write(16, addon.line + i + 1, false, bgBlack, fgWhite, &"{i + 1}: {option}", resetStyle)
     let newSelected = handleSelection(options.len, selected)
     if newSelected == selected:
       t.clear(addon.line .. addon.line + options.len)
@@ -118,16 +114,6 @@ proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.
     elif newSelected != -1:
       selected = newSelected
 
-proc relevantVersions(version: string): bool =
-  let s = version.split(".")
-  let major = parseInt(s[0])
-  let minor = parseInt(s[1])
-  case major
-  of 11, 12: return true
-  of 5: return minor > 4
-  of 1: return minor > 12
-  else: return false
-  
 proc chooseJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
   if json["data"].len == 0:
     addon.setAddonState(Failed, "Addon not found.", "Addon not found.")
@@ -137,23 +123,16 @@ proc chooseJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
     var tmp: seq[string]
     tmp.fromJson(data["gameVersions"])
     for item in tmp:
-      let s = item.split(".")
-      let major = s[0]
-      let minor = s[1]
-      if not gameVersionsSet.anyIt(it.split(".")[0] == major):
-        gameVersionsSet.incl(&"{major}.{minor}")
-  var gameVersions = gameVersionsSet.toSeq().filter(relevantVersions)
-  gameVersions.insert("Retail", 0)
+      gameVersionsSet.incl(getVersionName(item))
+  var gameVersions = gameVersionsSet.toSeq()
   var selectedVersion: string
   if gameVersions.len == 1:
     selectedVersion = gameVersions[0]
   else:
     selectedVersion = addon.userSelectGameVersion(gameVersions)
   addon.gameVersion = selectedVersion
-  if selectedVersion == "Retail":
-    return json["data"][0]
   for data in json["data"]:
     var tmp: seq[string]
     tmp.fromJson(data["gameVersions"])
-    if tmp.anyIt(it.rsplit(".", maxSplit = 1)[0] == selectedVersion):
+    if tmp.anyIt(getVersionName(it) == selectedVersion):
       return data
