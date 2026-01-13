@@ -258,8 +258,8 @@ proc list*(addons: seq[Addon]) =
     addon.line = line
   let 
     t = configData.term
-    nameSpace = addons[addons.map(a => a.getName().len).maxIndex()].getName().len + 2
-    versionSpace = addons[addons.map(a => a.getVersion().len).maxIndex()].getVersion().len + 2
+    nameSpace = addons[addons.mapIt(it.getName().len).maxIndex()].getName().len + 2
+    versionSpace = addons[addons.mapIt(it.getVersion().len).maxIndex()].getVersion().len + 2
   for addon in addons:
     addon.stateMessage(nameSpace, versionSpace)
   t.addLine()

@@ -174,10 +174,10 @@ proc processMessages(): seq[Addon] =
       of Done, DoneFailed:
         result.add(addon)
       else:
-        addons = addons.filter(a => a != addon)
+        addons = addons.filterIt(it != addon)
         addons.add(addon)
-        maxName = addons[addons.map(a => a.getName().len).maxIndex()].getName().len + 2
-        maxVersion = addons[addons.map(a => a.getVersion().len).maxIndex()].getVersion().len + 2
+        maxName = addons[addons.mapIt(it.getName().len).maxIndex()].getName().len + 2
+        maxVersion = addons[addons.mapIt(it.getVersion().len).maxIndex()].getVersion().len + 2
         for addon in addons:
           addon.stateMessage(maxName, maxVersion)
     else:
@@ -366,8 +366,8 @@ proc main() {.inline.} =
   processed &= processMessages()
   thr.joinThreads()
   
-  failed = processed.filter(a => a.state == DoneFailed)
-  success = processed.filter(a => a.state == Done)
+  failed = processed.filterIt(it.state == DoneFailed)
+  success = processed.filterIt(it.state == Done)
 
   let t = configData.term
   case action
@@ -377,7 +377,7 @@ proc main() {.inline.} =
   else:
     discard
 
-  rest = configData.addons.filter(addon => addon notin success)
+  rest = configData.addons.filterIt(it notin success)
   final = if action != Remove: success & rest else: rest
 
   writeAddons(final)
