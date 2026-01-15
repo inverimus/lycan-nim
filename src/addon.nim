@@ -65,7 +65,7 @@ proc setName(addon: Addon, json: JsonNode, name: string = "none") {.gcsafe.} =
   of Tukui:
     addon.name = json["name"].getStr()
   of Wowint:
-    addon.name = json[0]["UIName"].getStr()
+    addon.name = json["UIName"].getStr()
   of Wago:
     addon.name = json["props"]["addon"]["display_name"].getStr()
 
@@ -86,7 +86,7 @@ proc setVersion(addon: Addon, json: JsonNode) {.gcsafe.} =
   of Tukui:
     addon.version = json["version"].getStr()
   of Wowint:
-    addon.version = json[0]["UIVersion"].getStr()
+    addon.version = json["UIVersion"].getStr()
   of Wago:
     for data in json["props"]["releases"]["data"]:
       if data["supported_" & addon.gameVersion & "_patches"].len > 0:
@@ -111,13 +111,10 @@ proc setDownloadUrl(addon: Addon, json: JsonNode) {.gcsafe.} =
       addon.chooseDownloadUrlGitlab(json)
     else:
       addon.setDownloadUrlGitlab(json)
-    # for source in json[0]["assets"]["sources"]:
-    #   if source["format"].getStr() == "zip":
-    #     addon.downloadUrl = source["url"].getStr()
   of Tukui:
     addon.downloadUrl = json["url"].getStr()
   of Wowint:
-    addon.downloadUrl = json[0]["UIDownload"].getStr()
+    addon.downloadUrl = json["UIDownload"].getStr()
   of Wago:
     if addon.action == Install:
       addon.chooseDownloadUrlWago(json)
@@ -197,6 +194,8 @@ proc extractJson(addon: Addon): JsonNode {.gcsafe.} =
         addon.setAddonState(Failed, "JSON Error: Addon not found.", &"{addon.getName()}: JSON error, addon not found.")
     except KeyError:
       discard
+  of Wowint:
+    return json[0]
   else:
     discard
   return json
