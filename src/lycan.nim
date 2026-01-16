@@ -54,17 +54,16 @@ proc addonFromUrl(url: string): Option[Addon] =
   let pattern = re"^(?:https?://)?(?:www\.)?(.+)\.(?:com|org|io)/(.+[^/\n])"
   let found = find(cstring(url), pattern, urlmatch, 0, len(url))
   if found == -1 or urlmatch[1] == "":
-    t.write(0, fgRed, styleBright, &"Unable to determine addon from ", fgCyan, url, "\n", resetStyle)
-    echo &"Unable to determine addon from {url}."
+    t.write(0, fgRed, styleBright, "Error: ", fgWhite, &"Unable to determine addon from ", fgCyan, url, "\n", resetStyle)
   case urlmatch[0].toLower()
     of "curseforge":
       var m: array[1, string]
       let pattern = re"\/mods\/(\d+)\/"
       discard find(cstring(urlmatch[1]), pattern, m, 0, len(urlmatch[1]))
       if m[0] == "":
-        echo &"Unable to determine addon from {url}."
-        echo "Make sure you have the corret URL. Start a manual download then copy the 'try again' link."
-        echo "For curseforge, using the Project ID is easier. Locate the ID on the right side of the addon page and use lycan -i curse:<ID>"
+        t.write(0, fgRed, styleBright, "Error: ", fgWhite, &"Unable to determine addon from ", fgCyan, url, "\n", resetStyle)
+        t.write(2, fgYellow, "Make sure you have the corret URL. Start a manual download then copy the 'try again' link.\n")
+        t.write(2, fgYellow, "For curseforge, using the Project ID is easier. Locate the ID on the right side of the addon page and use lycan -i curse:<ID>\n")
       else:
         if validProject(m[0], Curse):
           return some(newAddon(m[0], Curse))
@@ -100,11 +99,12 @@ proc addonFromUrl(url: string): Option[Addon] =
   return none(Addon)
 
 proc addonFromProject(s: string): Option[Addon] =
+  let t = configData.term
   var match: array[2, string]
   let pattern = re"^([^:]+):(.*)$"
   let found = find(cstring(s), pattern, match, 0, len(s))
   if found == -1:
-    echo &"Unable to determine addon from {s}."
+    t.write(0, fgRed, styleBright, "Error: ", fgWhite, &"Unable to determine addon from ", fgCyan, s, "\n", resetStyle)
     return none(Addon)
   let source = match[0].toLower()
   let id = match[1].toLower()
@@ -202,7 +202,7 @@ proc main() {.inline.} =
   configData = loadConfig()
   logInit(configData.logLevel)
   var opt = initOptParser(
-    commandLineParams(), 
+    commandLineParams(),
     shortNoVal = {'u', 'i', 'a'}, 
     longNoVal = @["update"]
   )
@@ -244,6 +244,7 @@ proc main() {.inline.} =
     if actionCount > 1 or (len(args) > 0 and action == Empty):
       displayHelp()
 
+  let t = configData.term
   var
     addons: seq[Addon]
     line = 0
@@ -258,7 +259,7 @@ proc main() {.inline.} =
       addons.add(addon)
       line += 1
     if addons.len == 0:
-      echo "  Error: Unable to parse any addons to install."
+      t.write(2, fgRed, styleBright, "\nError: ", fgWhite, "Unable to parse any addons to install.\n", resetStyle)
       quit()
   of Update, Empty, Reinstall:
     for addon in configData.addons:
@@ -292,8 +293,8 @@ proc main() {.inline.} =
     try:
       id = int16(args[0].parseInt())
     except:
-      echo "  Add name override:   lycan -n <id> <new name>"
-      echo "  Clear name override: lycan -n <id>"
+      t.write(2, fgRed, styleBright, "\nError: ", fgWhite, "Unable to parse id.\n", resetStyle)
+      t.write(2, fgWhite, "Usage: lycan -n <id> <new name>  (Leave blank to reset to default)\n", resetStyle)
       quit()
     var opt = addonFromId(id)
     if opt.isSome:
@@ -307,7 +308,7 @@ proc main() {.inline.} =
       addon.action = Name
       addons.add(addon)
     else:
-      echo &"  No installed addon has id: {id}"
+      t.write(2, fgRed, styleBright, "\nError: ", fgWhite, &"Unable to find addon with id: ", fgCyan, $id, "\n", resetStyle)
   of List:
     addons = configData.addons
     if "t" in args or "time" in args:
@@ -345,7 +346,6 @@ proc main() {.inline.} =
   failed = processed.filterIt(it.state == DoneFailed)
   success = processed.filterIt(it.state == Done)
 
-  let t = configData.term
   case action
   of Install:
     assignIds(success & configData.addons)
