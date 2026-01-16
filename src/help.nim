@@ -29,8 +29,8 @@ proc displayHelp*(option: string = "") =
     t.write(4, "lycan -i curse:334372", "\n")
     t.write(6, fgYellow, "To get this url, go the addon page and click download, then click the download button, then copy the link for 'try again.'", "\n")
     t.write(6, fgYellow, "For curseforge, using the Project ID is easier. Locate the ID on the right side of the addon page.")
-    t.write(4, fgWhite, "lycan -i <filename>", "\n")
-    t.write(6, fgYellow, "This will try to install each line of the file as a separate addon.", "\n", resetStyle)
+    t.write(4, "lycan -i https://addons.wago.io/addons/rarescanner", "\n")
+
 
   of "c", "config":
     t.write(2, fgCyan, "-c, --config [options]", "\n\n")
@@ -50,11 +50,11 @@ proc displayHelp*(option: string = "") =
     t.write(6, fgWhite, "Sort by most recent install or update time.\n\n")
 
   else:
-    t.write(2, false, fgGreen, "Lycan", fgYellow, " ", version, fgWhite, " by inverimus\n\n", resetStyle)
-    t.write(2, true, fgCyan, "-a, --add <args>")
-    t.write(30, false, fgWhite, "Install an addon. <args> is a list of urls seperated by spaces.", "\n")
+    t.write(2, false, fgGreen, "Lycan", fgYellow, " ", version, fgWhite, " by Michael Green\n\n", resetStyle)
+    t.write(2, true, fgCyan, "-a, --add <addon>")
+    t.write(30, false, fgWhite, "Install an addon.", "\n")
     t.write(2, true, fgCyan, "-c, --config [options]")
-    t.write(30, false, fgWhite, "Configuration options. lycan --help config for more info", "\n")
+    t.write(30, false, fgWhite, "Configuration options.", "\n")
     t.write(6, true, fgCyan, "--help")
     t.write(30, false, fgWhite, "Display this message.", "\n")
     t.write(2, true, fgCyan, "-i, --install <args>")
