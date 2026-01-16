@@ -365,4 +365,5 @@ proc main() {.inline.} =
     t.write(0, fgRed, styleBright, &"\nError: ", fgCyan, addon.getName(), "\n", resetStyle)
     t.write(4, fgWhite, addon.errorMsg, "\n", resetStyle)
 
-main()
+when isMainModule:
+  main()
