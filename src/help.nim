@@ -28,8 +28,9 @@ proc displayHelp*(option: string = "") =
     t.write(4, "lycan -i https://www.curseforge.com/api/v1/mods/334372/files/4956577/download", "\n")
     t.write(4, "lycan -i curse:334372", "\n")
     t.write(6, fgYellow, "To get this url, go the addon page and click download, then click the download button, then copy the link for 'try again.'", "\n")
-    t.write(6, fgYellow, "For curseforge, using the Project ID is easier. Locate the ID on the right side of the addon page.")
-    t.write(4, "lycan -i https://addons.wago.io/addons/rarescanner", "\n")
+    t.write(6, fgYellow, "For curseforge, using the Project ID is easier. Locate the ID on the right side of the addon page.", "\n")
+    t.write(4, fgWhite, "lycan -i https://addons.wago.io/addons/rarescanner", "\n")
+    t.write(4, fgWhite, "lycan -i wago:rarescanner", "\n")
 
 
   of "c", "config":
