@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ]#
 
+
 #[
 https://github.com/Stanzilla/AdvancedInterfaceOptions
 https://github.com/Tercioo/Plater-Nameplates/tree/master
@@ -51,19 +52,12 @@ import files
 
 proc validProject(project: string, kind: AddonKind): bool =
   case kind
-  of Curse, Wowint:
-    return project.all(isDigit)
-  of Tukui:
-    return project == "tukui" or project == "elvui"
-  of Github:
-    return project.split("/").len == 2
-  of Gitlab:
-    let split = project.split("/")
-    return split.len == 2 or split.len == 3
-  of Wago:
-    return not project.contains("/")
-  else:
-    discard
+  of Curse, Wowint: return project.all(isDigit)
+  of Tukui:         return project == "tukui" or project == "elvui"
+  of Github:        return project.split("/").len == 2
+  of Wago:          return not project.contains("/")
+  of Gitlab:        return project.split("/").len in [2, 3]
+  else:             discard
   return false
 
 proc addonFromUrl(url: string): Option[Addon] =
@@ -127,7 +121,7 @@ proc addonFromProject(s: string): Option[Addon] =
   let source = match[0].toLower()
   let id = match[1].toLower()
   case source
-  of "curse":  
+  of "curse": 
     if validProject(id, Curse):  return some(newAddon(id, Curse))
   of "wowint": 
     if validProject(id, Wowint): return some(newAddon(id, Wowint))
