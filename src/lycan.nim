@@ -195,13 +195,7 @@ proc processLog() =
     else:
       break
 
-
-
-
-
-proc main() {.inline.} =
-  configData = loadConfig()
-  logInit(configData.logLevel)
+proc parseArgs(): (tuple[action: Action, args: seq[string]]) =
   var opt = initOptParser(
     commandLineParams(),
     shortNoVal = {'u', 'i', 'a'}, 
@@ -244,7 +238,17 @@ proc main() {.inline.} =
       displayHelp()
     if actionCount > 1 or (len(args) > 0 and action == Empty):
       displayHelp()
+  return (action, args)
 
+
+
+
+
+proc main() {.inline.} =
+  configData = loadConfig()
+  logInit(configData.logLevel)
+
+  let (action, args) = parseArgs()
   let t = configData.term
   var
     addons: seq[Addon]
