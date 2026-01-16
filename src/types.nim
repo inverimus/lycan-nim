@@ -5,7 +5,7 @@ const POLLRATE* = 20
 
 type
   Action* = enum
-    Install, Update, Remove, List, Pin, Unpin, Restore, Setup, Empty, Help, Name, Export, Reinstall
+    Install, Update, Remove, List, Pin, Unpin, Restore, Setup, Empty, Help, Name, Reinstall
 
   LogLevel* = enum
     Off = "OFF",

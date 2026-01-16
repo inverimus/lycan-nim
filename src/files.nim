@@ -8,7 +8,6 @@ import std/re
 import std/strformat
 import std/strutils
 import std/sugar
-import std/terminal
 import std/times
 
 import zippy/ziparchives
@@ -17,7 +16,6 @@ import config
 import types
 import logger
 import addonHelp
-import term
 
 proc toJsonHook*(a: Addon): JsonNode =
   result = newJObject()
@@ -32,22 +30,6 @@ proc toJsonHook*(a: Addon): JsonNode =
   result["pinned"] = %a.pinned
   result["dirs"] = %a.dirs
   result["time"] = %a.time.format("yyyy-MM-dd'T'HH:mm")
-
-proc exportAddons*(addons: seq[Addon]) =
-  let t = configData.term
-  let filename = getCurrentDir() / "exported_addons"
-  let f = open(filename, fmWrite)
-  for addon in configData.addons:
-    let kind = case addon.kind
-    of GithubRepo: "Github"
-    else: $addon.kind
-    var exportName = &"{kind}:{addon.project}"
-    if addon.branch.isSome:
-      exportName &= &"@{addon.branch.get}"
-    f.writeLine(exportName)
-  f.close()
-  t.write(4, fgGreen, &"Wrote {configData.addons.len} addons to {filename}", resetStyle, "\n")
-  quit()
 
 proc writeAddons*(addons: var seq[Addon]) =
   if not configData.addonJsonFile.isEmptyOrWhitespace:

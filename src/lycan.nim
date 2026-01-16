@@ -216,7 +216,6 @@ proc main() {.inline.} =
       if val == "":
         case key:
         of "a", "i":          action = Install;   actionCount += 1
-        of "e", "export":     action = Export;    actionCount += 1
         of "u", "update":     action = Update;    actionCount += 1
         of "r":               action = Remove;    actionCount += 1
         of "n", "name":       action = Name;      actionCount += 1
@@ -324,8 +323,6 @@ proc main() {.inline.} =
     if "t" in args or "time" in args:
       addons.sort((a, z) => int(a.time < z.time))
     addons.list()
-  of Export:
-    exportAddons(configData.addons)
   of Setup:
     changeConfig(args)
   of Help:
