@@ -203,8 +203,8 @@ proc main() {.inline.} =
   logInit(configData.logLevel)
   var opt = initOptParser(
     commandLineParams(), 
-    shortNoVal = {'u', 'i', 'a', 'e'}, 
-    longNoVal = @["update", "export"]
+    shortNoVal = {'u', 'i', 'a'}, 
+    longNoVal = @["update"]
   )
   var
     action = Empty
@@ -250,23 +250,13 @@ proc main() {.inline.} =
     ids: seq[int16]
   case action
   of Install:
-    var addonStrings: seq[string]
-    var f: File
-    if args.len > 0 and f.open(args[0]):
-      while true:
-        try: addonStrings.add(f.readline())
-        except: break
-      f.close()
-    else:
-      addonStrings = args
-    for str in addonStrings:
-      var opt = parseAddon(str)
-      if opt.isSome:
-        var addon = opt.get
-        addon.line = line
-        addon.action = Install
-        addons.add(addon)
-        line += 1
+    let opt = parseAddon(args[0])
+    if opt.isSome:
+      var addon = opt.get
+      addon.line = line
+      addon.action = Install
+      addons.add(addon)
+      line += 1
     if addons.len == 0:
       echo "  Error: Unable to parse any addons to install."
       quit()
