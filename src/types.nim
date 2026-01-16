@@ -13,7 +13,6 @@ type
     Warning = "WARN"
     Info = "INFO"
     Debug = "DEBUG"
-    None = "None"
 
   AddonState* = enum
     Checking = "Checking",

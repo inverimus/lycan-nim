@@ -30,18 +30,18 @@ proc log*(msg: string, level: LogLevel = Debug) =
   case logLevel:
   of Debug, Fatal, Warning, Info:
     loggedMessage = &"[{time()}]:[{$level}] {msg}\n"
-  of Off, None:
+  of Off:
     return
   writeLog(loggedMessage)
 
-proc log*(msg: string, level: LogLevel, e: ref Exception) =
+proc log*(msg: string, level: LogLevel = Debug, e: ref Exception) =
   var loggedMessage: string
   case logLevel:
   of Debug:
     loggedMessage = &"[{time()}]:[{$level}]\n{e.name}: {e.msg}\n{e.getStackTrace()}\n"
   of Fatal, Warning, Info:
     loggedMessage = &"[{time()}]:[{$level}] {e.name}: {e.msg}\n"
-  of Off, None:
+  of Off:
     return
   writeLog(loggedMessage)
 
