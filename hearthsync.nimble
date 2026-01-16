@@ -3,9 +3,9 @@
 version       = "0.1.0"
 author        = "Michael Green"
 description   = "A very simple World of Warcraft addon manager"
-license       = "GPL-3.0-only"
+license       = "GPLv3+"
 srcDir        = "src"
-bin           = @["lycan"]
+namedBin      = {"hearthsync":"hs"}.toTable
 
 
 # Dependencies

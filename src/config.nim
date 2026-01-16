@@ -59,7 +59,7 @@ proc parseInstalledAddons(filename: string): seq[Addon] =
     result.add(a)
 
 
-let configPath = getCurrentDir() / "lycan.cfg"
+let configPath = getCurrentDir() / "hearthsync.cfg"
 
 proc writeConfig*(config: Config) =
   var json = newJObject()
@@ -76,10 +76,10 @@ proc writeConfig*(config: Config) =
 
 proc loadConfig*(): Config =
   result = Config()
-  result.tempDir = getTempDir() / "lycan"
+  result.tempDir = getTempDir() / "hearthsync"
   createDir(result.tempDir)
   result.term = termInit()
-  result.addonJsonFile = getCurrentDir() / "WTF" / "lycan_addons.json"
+  result.addonJsonFile = getCurrentDir() / "WTF" / "hearthsync_addons.json"
   result.installDir = getCurrentDir() / "Interface" / "AddOns"
   
   var configJson: JsonNode
@@ -88,7 +88,7 @@ proc loadConfig*(): Config =
   except:
     result.logLevel = Debug
     result.backupEnabled = true
-    result.backupDir = getCurrentDir() / "Interface" / "lycan_backup"
+    result.backupDir = getCurrentDir() / "Interface" / "hearthsync_backup"
     result.githubToken = ""
     result.addons = @[]
     writeConfig(result)

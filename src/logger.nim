@@ -9,7 +9,7 @@ var logLevel: LogLevel
 var logChannel*: Channel[LogMessage]
 
 proc logInit*(level: LogLevel) =
-  let logFileName = getCurrentDir() / "lycan.log"
+  let logFileName = getCurrentDir() / "hearthsync.log"
   logFile = open(logFileName, fmWrite)
   logFile.close()
   logLevel = level
@@ -20,7 +20,7 @@ proc time(): string =
   return now().format("HH:mm:ss'.'fff")
 
 proc writeLog(msg: string) =
-  let logFileName = getCurrentDir() / "lycan.log"
+  let logFileName = getCurrentDir() / "hearthsync.log"
   logFile = open(logFileName, fmAppend)
   logFile.write(msg)
   logFile.close()
