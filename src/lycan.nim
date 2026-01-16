@@ -383,7 +383,7 @@ proc main() {.inline.} =
   writeAddons(final)
   writeConfig(configData)
 
-  t.write(0, t.yMax, false, "\n")
+  t.addLine()
   for addon in failed:
     t.write(0, t.yMax, false, fgRed, styleBright, &"\nError: ", fgCyan, addon.getName(), "\n", resetStyle)
     t.write(4, t.yMax, false, fgWhite, addon.errorMsg, "\n", resetStyle)
