@@ -323,20 +323,7 @@ proc main() {.inline.} =
       addons.sort((a, z) => int(a.time < z.time))
     addons.list()
   of Export:
-    let filename = getCurrentDir() / "exported_addons"
-    let f = open(filename, fmWrite)
-    for addon in configData.addons:
-      let kind = case addon.kind
-      of GithubRepo: "Github"
-      else: $addon.kind
-      var exportName = &"{kind}:{addon.project}"
-      if addon.branch.isSome:
-        exportName &= &"@{addon.branch.get}"
-      echo &"  Exported {addon.getName()}:  {exportName}"
-      f.writeLine(exportName)
-    f.close()
-    echo &"    Wrote {configData.addons.len} addons to {filename}"
-    quit()
+    exportAddons(configData.addons)
   of Setup:
     changeConfig(args)
   of Help:
