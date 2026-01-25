@@ -53,11 +53,11 @@ import files
 proc validProject(project: string, kind: AddonKind): bool =
   case kind
   of Curse, Wowint: return project.all(isDigit)
-  of Tukui:         return project == "tukui" or project == "elvui"
-  of Github:        return project.split("/").len == 2
-  of Wago:          return not project.contains("/")
-  of Gitlab:        return project.split("/").len in [2, 3]
-  else:             discard
+  of Tukui: return project == "tukui" or project == "elvui"
+  of Github: return project.split("/").len == 2
+  of Wago: return not project.contains("/")
+  of Gitlab: return project.split("/").len in [2, 3]
+  else: discard
   return false
 
 proc addonFromUrl(url: string): Option[Addon] =
@@ -114,23 +114,22 @@ proc addonFromProject(s: string): Option[Addon] =
   let t = configData.term
   var match: array[2, string]
   let pattern = re"^([^:]+):(.*)$"
-  let found = find(cstring(s), pattern, match, 0, len(s))
-  if found == -1:
+  if find(cstring(s), pattern, match, 0, len(s)) == -1:
     t.write(0, fgRed, styleBright, "Error: ", fgWhite, &"Unable to determine addon from ", fgCyan, s, "\n", resetStyle)
     return none(Addon)
   let source = match[0].toLower()
   let id = match[1].toLower()
   case source
-  of "curse": 
-    if validProject(id, Curse):  return some(newAddon(id, Curse))
-  of "wowint": 
+  of "curse":
+    if validProject(id, Curse): return some(newAddon(id, Curse))
+  of "wowint":
     if validProject(id, Wowint): return some(newAddon(id, Wowint))
-  of "tukui":  
-    if validProject(id, Tukui):  return some(newAddon(id, Tukui))
-  of "gitlab": 
+  of "tukui":
+    if validProject(id, Tukui): return some(newAddon(id, Tukui))
+  of "gitlab":
     if validProject(id, Gitlab): return some(newAddon(id, Gitlab))
-  of "wago":   
-    if validProject(id, Wago):   return some(newAddon(id, Wago))
+  of "wago":
+    if validProject(id, Wago): return some(newAddon(id, Wago))
   of "github":
     if validProject(id, Github):
       var match: array[2, string]
@@ -140,15 +139,14 @@ proc addonFromProject(s: string): Option[Addon] =
         return some(newAddon(id, Github))
       else:
         return some(newAddon(match[0], GithubRepo, branch = some(match[1])))
-  else: 
+  else:
     discard
   return none(Addon)
 
 proc parseAddon(s: string): Option[Addon] =
   var match: array[2, string]
   let pattern = re"^(?:https?:\/\/)?(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+.*[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?"
-  let found = find(cstring(s), pattern, match, 0, len(s))
-  if found == -1:
+  if find(cstring(s), pattern, match, 0, len(s)) == -1:
     return addonFromProject(s)
   else:
     return addonFromUrl(s)
@@ -173,7 +171,8 @@ proc changeConfig(args: seq[string]) =
     of "github":
       setGithubToken(args[i + 1]); break
     else:
-      t.write(0, fgRed, styleBright, "Error: ", fgWhite, "Unrecognized option ", fgCyan, item, "\n", resetStyle)
+      t.write(0, fgRed, styleBright, "Error: ", fgWhite, "Unrecognized option ",
+          fgCyan, item, "\n", resetStyle)
       displayHelp("config")
   writeConfig(configData)
   quit()
@@ -210,7 +209,7 @@ proc processLog() =
 proc parseArgs(): (tuple[action: Action, args: seq[string]]) =
   var opt = initOptParser(
     commandLineParams(),
-    shortNoVal = {'u', 'i', 'a'}, 
+    shortNoVal = {'u', 'i', 'a'},
     longNoVal = @["update"]
   )
   var
@@ -222,27 +221,27 @@ proc parseArgs(): (tuple[action: Action, args: seq[string]]) =
     of cmdShortOption, cmdLongOption:
       if val == "":
         case key:
-        of "a", "i":          action = Install;   actionCount += 1
-        of "u", "update":     action = Update;    actionCount += 1
-        of "r":               action = Remove;    actionCount += 1
-        of "n", "name":       action = Name;      actionCount += 1
-        of "l", "list":       action = List;      actionCount += 1
-        of "c", "config":     action = Setup;     actionCount += 1
-        of "h", "help":       action = Help;      actionCount += 1
-        of "reinstall":       action = Reinstall; actionCount += 1
+        of "a", "i": action = Install; actionCount += 1
+        of "u", "update": action = Update; actionCount += 1
+        of "r": action = Remove; actionCount += 1
+        of "n", "name": action = Name; actionCount += 1
+        of "l", "list": action = List; actionCount += 1
+        of "c", "config": action = Setup; actionCount += 1
+        of "h", "help": action = Help; actionCount += 1
+        of "reinstall": action = Reinstall; actionCount += 1
         else: displayHelp()
       else:
         args.add(val)
         case key:
-        of "add", "install":  action = Install; actionCount += 1
-        of "r", "remove":     action = Remove;  actionCount += 1
-        of "l", "list":       action = List;    actionCount += 1
-        of "pin":             action = Pin;     actionCount += 1
-        of "unpin":           action = Unpin;   actionCount += 1
-        of "name":            action = Name;    actionCount += 1
-        of "restore":         action = Restore; actionCount += 1
-        of "c", "config":     action = Setup;   actionCount += 1
-        of "help":            action = Help;    actionCount += 1
+        of "add", "install": action = Install; actionCount += 1
+        of "r", "remove": action = Remove; actionCount += 1
+        of "l", "list": action = List; actionCount += 1
+        of "pin": action = Pin; actionCount += 1
+        of "unpin": action = Unpin; actionCount += 1
+        of "name": action = Name; actionCount += 1
+        of "restore": action = Restore; actionCount += 1
+        of "c", "config": action = Setup; actionCount += 1
+        of "help": action = Help; actionCount += 1
         else: displayHelp()
     of cmdArgument:
       args.add(key)
@@ -276,7 +275,8 @@ proc main() {.inline.} =
       addons.add(addon)
       line += 1
     if addons.len == 0:
-      t.write(2, fgRed, styleBright, "Error: ", fgWhite, "Unable to parse any addons to install.\n", resetStyle)
+      t.write(2, fgRed, styleBright, "Error: ", fgWhite,
+          "Unable to parse any addons to install.\n", resetStyle)
       quit()
   of Update, Empty, Reinstall:
     for addon in configData.addons:
@@ -298,10 +298,10 @@ proc main() {.inline.} =
         var addon = opt.get
         addon.line = line
         case action
-        of Remove:  addon.action = Remove
+        of Remove: addon.action = Remove
         of Restore: addon.action = Restore
-        of Pin:     addon.action = Pin
-        of Unpin:   addon.action = Unpin
+        of Pin: addon.action = Pin
+        of Unpin: addon.action = Unpin
         else: discard
         addons.add(addon)
         line += 1
@@ -359,7 +359,7 @@ proc main() {.inline.} =
   processLog()
   processed &= processMessages()
   thr.joinThreads()
-  
+
   failed = processed.filterIt(it.state == DoneFailed)
   success = processed.filterIt(it.state == Done)
 

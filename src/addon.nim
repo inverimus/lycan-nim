@@ -162,8 +162,7 @@ proc extractJson(addon: Addon): JsonNode {.gcsafe.} =
   of Wago:
     let pattern = re("""data-page="({.+?})"""")
     var matches: array[1, string]
-    let found = find(cstring(response.body), pattern, matches, 0, len(response.body))
-    if found != -1:
+    if find(cstring(response.body), pattern, matches, 0, len(response.body)) != -1:
       let clean = matches[0].replace("&quot;", "\"").replace("\\/", "/").replace("&amp;", "&")
       json = parseJson(clean)
   else:
