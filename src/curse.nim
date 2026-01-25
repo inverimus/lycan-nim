@@ -34,31 +34,31 @@ proc getVersionName(majorVersion, minorVersion: int): string =
   of 12: # Midnight
     case minorVersion
     of 0..2: result = "Retail"
-    else: result = "Classic"
+    else: result = "Midnight Classic"
   of 11: # The War Within
     case minorVersion
     of 0..2: result = "Retail"
-    else: result = "Classic"
+    else: result = "TWW Classic"
   of 10: # Dragonflight
     case minorVersion
     of 0..2: result = "Retail"
-    else: result = "Classic"
+    else: result = "Dragonflight Classic"
   of 9: # Shadowlands
     case minorVersion
     of 0..2: result = "Retail"
-    else: result = "Classic"
+    else: result = "Shadowlands Classic"
   of 8: # Battle for Azeroth
     case minorVersion
     of 0..3: result = "Retail"
-    else: result = "Classic"
+    else: result = "BfA Classic"
   of 7: # Legion
     case minorVersion
     of 0..3: result = "Retail"
-    else: result = "Classic"
+    else: result = "Legion Classic"
   of 6: # Warlords of Draenor
     case minorVersion
     of 0..2: result = "Retail"
-    else: result = "Classic"
+    else: result = "WoD Classic"
   of 5: # Mists of Pandaria
     case minorVersion
     of 0..4: result = "Retail"
