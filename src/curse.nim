@@ -21,6 +21,8 @@ proc nameCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
 proc versionCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
   try:
     result = json["displayName"].getStr()
+    result = result.replace(addon.nameCurse(json), "")
+    result = result.strip(chars = {' ', '_', '-', '.'})
     if result.endsWith(".zip"):
       result = json["dateModified"].getStr()
   except KeyError:
@@ -28,54 +30,54 @@ proc versionCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
 
 proc getVersionName(majorVersion, minorVersion: int): string =
   case majorVersion
-  of 12:
+  of 12: # Midnight
     case minorVersion
     of 0..2: result = "Retail"
-    else: result = "Midnight Classic"
-  of 11:
+    else: result = "Classic"
+  of 11: # The War Within
     case minorVersion
     of 0..2: result = "Retail"
-    else: result = "TWW Classic"
-  of 10:
+    else: result = "Classic"
+  of 10: # Dragonflight
     case minorVersion
-    of 0..2: result = "Dragonflight"
-    else: result = "Dragonflight Classic"
-  of 9:
+    of 0..2: result = "Retail"
+    else: result = "Classic"
+  of 9: # Shadowlands
     case minorVersion
-    of 0..2: result = "Shadowlands"
-    else: result = "Shadowlands Classic"
-  of 8:
+    of 0..2: result = "Retail"
+    else: result = "Classic"
+  of 8: # Battle for Azeroth
     case minorVersion
-    of 0..3: result = "Battle for Azeroth"
-    else: result = "BfA Classic"
-  of 7:
+    of 0..3: result = "Retail"
+    else: result = "Classic"
+  of 7: # Legion
     case minorVersion
-    of 0..3: result = "Legion"
-    else: result = "Legion Classic"
-  of 6:
+    of 0..3: result = "Retail"
+    else: result = "Classic"
+  of 6: # Warlords of Draenor
     case minorVersion
-    of 0..2: result = "Warlords of Draenor"
-    else: result = "WoD Classic"
-  of 5:
+    of 0..2: result = "Retail"
+    else: result = "Classic"
+  of 5: # Mists of Pandaria
     case minorVersion
-    of 0..4: result = "Mists of Pandaria"
+    of 0..4: result = "Retail"
     else: result = "MoP Classic"
-  of 4:
+  of 4: # Cataclysm
     case minorVersion
-    of 0..3: result = "Cataclysm"
+    of 0..3: result = "Retail"
     else: result = "Cataclysm Classic"
-  of 3:
+  of 3: # Wrath of the Lich King
     case minorVersion
-    of 0..3: result = "Wrath of the Lich King"
-    else: result = "WotLK Classic"
-  of 2:
+    of 0..3: result = "Retail"
+    else: result = "WotlK Classic"
+  of 2: # The Burning Crusade 
     case minorVersion
-    of 0..4: result = "The Burning Crusade"
+    of 0..4: result = "Retail"
     else: result = "TBC Classic"
-  of 1:
+  of 1: # Vanilla
     case minorVersion
-    of 0..12: result = "Vanilla"
-    else: result = "Classic (Vanilla)"
+    of 0..12: result = "Retail"
+    else: result = "Classic (Vanilla 1.15)"
   else: 
     result = "Unknown"
 

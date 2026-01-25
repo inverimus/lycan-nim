@@ -85,10 +85,7 @@ proc setVersion(addon: Addon, json: JsonNode) {.gcsafe.} =
   of Wowint:
     addon.version = json["UIVersion"].getStr()
   of Wago:
-    for data in json["props"]["releases"]["data"]:
-      if data["supported_" & addon.gameVersion & "_patches"].len > 0:
-        addon.version = data["label"].getStr()
-        return
+    addon.version = addon.versionWago(json)
 
 proc setDownloadUrl(addon: Addon, json: JsonNode) {.gcsafe.} =
   if addon.state == Failed: return

@@ -2,12 +2,21 @@ import std/enumerate
 import std/sets
 import std/json
 import std/sequtils
+import std/strutils
 import std/strformat
 import std/terminal
 
 import types
 import term
 import addonHelp
+
+proc versionWago*(addon: Addon, json: JsonNode): string {.gcsafe.} =
+  for data in json["props"]["releases"]["data"]:
+    if data["supported_" & addon.gameVersion & "_patches"].len > 0:
+      result = data["label"].getStr()
+      break
+  result = result.replace(json["props"]["addon"]["display_name"].getStr(), "")
+  result = result.strip(chars = {' ', '_', '-', '.'})
 
 proc setDownloadUrlWago*(addon: Addon, json: JsonNode) {.gcsafe.} =
   for data in json["props"]["releases"]["data"]:
@@ -18,13 +27,13 @@ proc setDownloadUrlWago*(addon: Addon, json: JsonNode) {.gcsafe.} =
 
 proc getVersionName(version: string): string =
   case version
-  of "retail": result = "Retail"
-  of "cata": result = "Cataclysm"
-  of "wotlk": result = "WotLK"
-  of "bc": result = "Burning Crusade"
-  of "classic": result = "Classic"
-  of "mop": result = "Mists of Pandaria"
-  else: result = "Unknown"
+  of "retail":  result = "Retail"
+  of "cata":    result = "Cataclysm Classic"
+  of "wotlk":   result = "WotLK Classic"
+  of "bc":      result = "TBC Classic"
+  of "classic": result = "Classic (Vanilla 1.15)"
+  of "mop":     result = "MoP Classic"
+  else:         result = "Unknown"
 
 proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.} =
   let t = addon.config.term
