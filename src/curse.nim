@@ -11,12 +11,15 @@ import types
 import term
 import addonHelp
 
+import std/re
+
 proc nameCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
-  result = json["fileName"].getStr().split('-')[0]
-  if result.endsWith(".zip"):
-    result = json["fileName"].getStr().split('_')[0]
-  if result.endsWith(".zip"):
-    result = json["fileName"].getStr().split('.')[0]
+  let fileName = json["fileName"].getStr()
+  let pos = fileName.find(re"[-_.]")
+  if pos != -1:
+    result = fileName[0 ..< pos]
+  else:
+    result = fileName
 
 proc versionCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
   try:
