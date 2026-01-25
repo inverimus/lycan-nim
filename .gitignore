@@ -1,11 +1,11 @@
 nimcache/
 nimblecache/
 htmldocs/
-lycan
-lycan.exe
-src/lycan
-src/lycan.exe
+src/hearthsync
+src/hearthsync.exe
 hs
+hearthsync
+hearthsync.exe
 hs.exe
 src/hs
 src/hs.exe
