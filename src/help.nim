@@ -14,7 +14,7 @@ proc displayHelp*(option: string = "") =
   of "a", "i", "add", "install":
     t.write(2, fgCyan, "-a, --add <args>", "\n")
     t.write(2, fgCyan, "-i, --install <args>", "\n\n")
-    t.write(2, fgWhite, "Installs an addon from a url, addon short name, or file. Supported sites are github releases, github repositories, gitlab releases, tukui, wowinterface, and curseforge.\n\n")
+    t.write(2, fgWhite, "Installs an addon from a url, addon short name, or file. Supported sites are, github, gitlab, tukui, wowinterface, curseforge, and wago.io.\n\n")
     t.write(2, fgGreen, "EXAMPLES:", "\n")
     t.write(4, fgWhite, &"{getAppFilename()} -i https://github.com/Stanzilla/AdvancedInterfaceOptions", "\n")
     t.write(4, fgWhite, &"{getAppFilename()} -i github:Stanzilla/AdvancedInterfaceOptions", "\n")
