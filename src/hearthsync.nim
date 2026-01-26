@@ -206,53 +206,30 @@ proc processLog() =
       break
 
 proc parseArgs(): (tuple[action: Action, args: seq[string]]) =
-  var opt = initOptParser(
-    commandLineParams(),
-    shortNoVal = {'u', 'i', 'a'},
-    longNoVal = @["update"]
-  )
-  var
-    action = Empty
-    actionCount = 0
-    args: seq[string]
+  if commandLineParams().len == 0:
+    return (Update, @[])
+  var opt = initOptParser()
+  var action: Action
   for kind, key, val in opt.getopt():
     case kind
+    of cmdEnd: doAssert(false)
     of cmdShortOption, cmdLongOption:
-      if val == "":
-        case key:
-        of "a", "i": action = Install; actionCount += 1
-        of "u", "update": action = Update; actionCount += 1
-        of "r": action = Remove; actionCount += 1
-        of "n", "name": action = Name; actionCount += 1
-        of "l", "list": action = List; actionCount += 1
-        of "c", "config": action = Setup; actionCount += 1
-        of "h", "help": action = Help; actionCount += 1
-        of "reinstall": action = Reinstall; actionCount += 1
-        else: displayHelp()
-      else:
-        args.add(val)
-        case key:
-        of "add", "install": action = Install; actionCount += 1
-        of "r", "remove": action = Remove; actionCount += 1
-        of "l", "list": action = List; actionCount += 1
-        of "pin": action = Pin; actionCount += 1
-        of "unpin": action = Unpin; actionCount += 1
-        of "name": action = Name; actionCount += 1
-        of "restore": action = Restore; actionCount += 1
-        of "c", "config": action = Setup; actionCount += 1
-        of "help": action = Help; actionCount += 1
-        else: displayHelp()
+      displayHelp()
     of cmdArgument:
-      args.add(key)
-    else:
-      displayHelp()
-    if actionCount > 1 or (len(args) > 0 and action == Empty):
-      displayHelp()
-  return (action, args)
-
-
-
-
+      case key:
+      of "a", "i", "add", "install": action = Install
+      of "u", "update": action = Update
+      of "r", "remove": action = Remove
+      of "n", "name": action = Name
+      of "l", "list": action = List
+      of "c", "config": action = Setup
+      of "h", "help": action = Help
+      of "reinstall": action = Reinstall
+      of "pin": action = Pin
+      of "unpin": action = Unpin
+      of "restore": action = Restore
+      else: displayHelp()
+      return (action, opt.remainingArgs())
 
 proc main() {.inline.} =
   configData = loadConfig()
