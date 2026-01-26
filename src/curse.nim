@@ -12,7 +12,8 @@ import types
 import term
 import addonHelp
 
-import logger
+when not defined(release):
+  import logger
 
 proc nameCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
   result = json["fileName"].getStr()
@@ -21,14 +22,10 @@ proc nameCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
     result = result[0 ..< pos]
 
 proc versionCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
-  log(json.pretty())
   try:
     result = json["displayName"].getStr()
-    log(result)
     result = result.replace(addon.nameCurse(json), "").replace(".zip", "")
-    log(result)
     result = result.strip(chars = {' ', '_', '-', '.'})
-    log(result)
   except KeyError:
     result = json["dateModified"].getStr()
 
@@ -101,8 +98,7 @@ proc extractJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
   addon.setAddonState(Failed, &"JSON Error: No game version matches current verion of {addon.gameVersion}.")
   return
 
-proc userSelectGameVersion(addon: Addon, options: seq[
-    string]): string {.gcsafe.} =
+proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.} =
   let t = addon.config.term
   var selected = 1
   for _ in 0 ..< options.len:

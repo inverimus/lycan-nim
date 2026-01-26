@@ -10,6 +10,9 @@ import types
 import term
 import addonHelp
 
+when not defined(release):
+  import logger
+
 proc versionWago*(addon: Addon, json: JsonNode): string {.gcsafe.} =
   for data in json["props"]["releases"]["data"]:
     if data["supported_" & addon.gameVersion & "_patches"].len > 0:

@@ -9,6 +9,9 @@ import config
 import types
 import term
 
+when not defined(release):
+  import logger
+
 const DARK_GREY: Color = Color(0x20_20_20)
 const LIGHT_GREY: Color = Color(0x34_34_34)
 
