@@ -275,8 +275,7 @@ proc main() {.inline.} =
       addons.add(addon)
       line += 1
     if addons.len == 0:
-      t.write(2, fgRed, styleBright, "Error: ", fgWhite,
-          "Unable to parse any addons to install.\n", resetStyle)
+      t.write(2, fgRed, styleBright, "Error: ", fgWhite, "Unable to parse any addons to install.\n", resetStyle)
       quit()
   of Update, Empty, Reinstall:
     for addon in configData.addons:
