@@ -130,7 +130,14 @@ proc chooseJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
   if gameVersionsSet.len == 1:
     addon.gameVersion = gameVersionsSet.toSeq()[0]
   else:
-    addon.gameVersion = addon.userSelectGameVersion(gameVersionsSet.toSeq())
+    var options = gameVersionsSet.toSeq()
+    for ver in ["TBC Classic", "Classic (Vanilla 1.15)", "MoP Classic", "Retail"]:
+      let idx = options.find(ver)
+      if idx != -1:
+        let val = options[idx]
+        options.delete(idx)
+        options.insert(val, 0)
+    addon.gameVersion = addon.userSelectGameVersion(options)
   for data in json["data"]:
     var tmp: seq[string]
     tmp.fromJson(data["gameVersions"])

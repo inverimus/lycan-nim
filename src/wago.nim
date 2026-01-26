@@ -60,7 +60,7 @@ proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.
 proc chooseDownloadUrlWago*(addon: Addon, json: JsonNode) {.gcsafe.} =
   var gameVersions: OrderedSet[string]
   for data in json["props"]["releases"]["data"]:
-    let patches = ["retail", "cata", "wotlk", "bc", "classic", "mop"]
+    let patches = ["retail", "mop", "classic", "bc", "wotlk", "cata"]
     for patch in patches:
       if data["supported_" & patch & "_patches"].len > 0:
         gameVersions.incl(patch)
