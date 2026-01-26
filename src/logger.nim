@@ -45,6 +45,12 @@ proc log*(msg: string, level: LogLevel = Debug, e: ref Exception) =
     return
   writeLog(loggedMessage)
 
+proc debugLog*(msg: string) =
+  when not defined(release):
+    writeLog(&"[{time()}]:[DEBUG] {msg}\n")
+  else:
+    discard
+
 proc log*(logMessage: LogMessage) =
   if logMessage.e.isNil:
     log(logMessage.msg, logMessage.level)
