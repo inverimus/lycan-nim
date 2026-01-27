@@ -51,6 +51,8 @@ proc displayHelp*(args: seq[string] = @[]) =
     t.write(2, fgGreen, "OPTIONS:", "\n")
     t.write(4, fgCyan, "[t|time]\n")
     t.write(6, fgWhite, "Sort by most recent install or update time.\n\n")
+    t.write(4, fgCyan, "[all]\n")
+    t.write(6, fgWhite, "Show full information for each addon.\n\n")
 
   else:
     t.write(2, fgGreen, "Hearthsync", fgYellow, " ", version, fgWhite, " by Michael Green\n\n", resetStyle)

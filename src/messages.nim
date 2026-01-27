@@ -16,7 +16,7 @@ when not defined(release):
 const DARK_GREY: Color = Color(0x20_20_20)
 const LIGHT_GREY: Color = Color(0x34_34_34)
 
-proc stateMessage*(addon: Addon, nameSpace, versionSpace: int) = 
+proc stateMessage*(addon: Addon, nameSpace, versionSpace: int, full: bool = false) = 
   case addon.state
   of Failed, DoneFailed: return
   else: discard
@@ -47,7 +47,7 @@ proc stateMessage*(addon: Addon, nameSpace, versionSpace: int) =
   case addon.state
   of List:
     let pin = if addon.pinned: "!" else: " "
-    let time = addon.time.format("dd-MM-yy hh:mm")
+    let time = addon.time.format("MM-dd-yy hh:mm")
     t.write(1, addon.line, true, colors, style,
       fgBlue, &"{addon.id:<3}",
       fgWhite, &"{addon.getName().alignLeft(nameSpace)}",
@@ -56,7 +56,9 @@ proc stateMessage*(addon: Addon, nameSpace, versionSpace: int) =
       fgCyan, &"{kind:<6}",
       fgWhite, if addon.branch.isSome: "@" else: "",
       fgBlue, if addon.branch.isSome: &"{branch:<11}" else: &"{branch:<12}",
-      fgWhite, &"{time}",
+      fgWhite, &"{time:<20}",
+      if full: fgBlue else: fgWhite,
+      if full: &"{addon.project:<40}" else: "",
       resetStyle)
   else:
     t.write(indent, addon.line, true, colors, style,

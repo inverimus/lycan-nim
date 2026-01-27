@@ -242,7 +242,7 @@ proc unpin(addon: Addon) =
   addon.pinned = false
   addon.setAddonState(Unpinned)
 
-proc list*(addons: seq[Addon]) =
+proc list*(addons: seq[Addon], args: seq[string] = @[]) =
   let t = configData.term
   if addons.len == 0:
     t.write(2, fgWhite, "No addons installed\n", resetStyle)
@@ -253,8 +253,11 @@ proc list*(addons: seq[Addon]) =
   let 
     nameSpace = addons[addons.mapIt(it.getName().len).maxIndex()].getName().len + 2
     versionSpace = addons[addons.mapIt(it.getVersion().len).maxIndex()].getVersion().len + 2
+  var full: bool = false
+  if args.len > 0:
+    full = args[0] == "all"
   for addon in addons:
-    addon.stateMessage(nameSpace, versionSpace)
+    addon.stateMessage(nameSpace, versionSpace, full)
   t.addLine()
   quit()
 

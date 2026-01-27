@@ -177,7 +177,7 @@ proc main() {.inline.} =
     addons = configData.addons
     if "t" in args or "time" in args:
       addons.sort((a, z) => int(a.time < z.time))
-    addons.list()
+    addons.list(args)
   of Setup:
     changeConfig(args)
   of Help:
