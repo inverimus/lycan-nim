@@ -1,5 +1,4 @@
 import std/enumerate
-import std/sets
 import std/json
 import std/jsonutils
 import std/re
@@ -121,24 +120,23 @@ proc chooseJsonCurse*(addon: Addon, json: JsonNode): JsonNode {.gcsafe.} =
   if json["data"].len == 0:
     addon.setAddonState(Failed, "Addon not found in JSON.")
     return
-  var gameVersionsSet: OrderedSet[string]
+  var gameVersions: seq[string]
   # json["data"] is only so big so if the last update that contains a game version was too long ago we cannot get it
   for data in json["data"]:
     var versions: seq[string]
     versions.fromJson(data["gameVersions"])
     for v in versions:
-      gameVersionsSet.incl(getVersionName(v))
-  if gameVersionsSet.len == 1:
-    addon.gameVersion = gameVersionsSet.toSeq()[0]
+      gameVersions.addUnique(getVersionName(v))
+  if gameVersions.len == 1:
+    addon.gameVersion = gameVersions[0]
   else:
-    var options = gameVersionsSet.toSeq()
     for ver in ["TBC Classic", "Classic (Vanilla 1.15)", "MoP Classic", "Retail"]:
-      let idx = options.find(ver)
+      let idx = gameVersions.find(ver)
       if idx != -1:
-        let val = options[idx]
-        options.delete(idx)
-        options.insert(val, 0)
-    addon.gameVersion = addon.userSelectGameVersion(options)
+        let val = gameVersions[idx]
+        gameVersions.delete(idx)
+        gameVersions.insert(val, 0)
+    addon.gameVersion = addon.userSelectGameVersion(gameVersions)
   for data in json["data"]:
     var tmp: seq[string]
     tmp.fromJson(data["gameVersions"])
