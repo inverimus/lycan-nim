@@ -157,6 +157,9 @@ proc main() {.inline.} =
     if addons.len == 0:
       displayHelp()
   of Remove, Restore, Pin, Unpin:
+    if args.len == 0:
+      t.write(2, fgRed, styleBright, "Error: ", fgWhite, &"Unable to parse any addons to {($action).toLowerAscii()}. Please provide a list of addon ids.\n", resetStyle)
+      quit()
     for arg in args:
       try:
         ids.add(int16(arg.parseInt()))
