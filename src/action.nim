@@ -20,10 +20,9 @@ proc validProject(project: string, kind: AddonKind): bool =
   of Curse, Wowint: return project.all(isDigit)
   of Tukui:         return project == "tukui" or project == "elvui"
   of Github:        return project.split("/").len == 2
-  of GithubRepo:    return true #TODO
-  of Wago:          return not project.contains("/")
+  of Wago, Zremax:  return not project.contains("/")
   of Gitlab:        return project.split("/").len in [2, 3]
-  of Zremax:        return not project.contains("/") #TODO
+  else:             return false
  
 proc addonFromUrl(url: string): Option[Addon] =
   let t = configData.term
