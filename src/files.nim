@@ -109,11 +109,10 @@ proc tocDir(path: string): bool {.gcsafe.} =
       var (dir, name, ext) = splitFile(file)
       if ext == ".toc":
         if name != lastPathPart(dir):
-          let p = re("(.+?)(?:$|[-_](?i:mainline|classic|vanilla|classic_era|wrath|tbc|bcc|cata|wotlk|mop))", flags = {reIgnoreCase})
-          var m: array[2, string]
-          discard find(cstring(name), p, m, 0, len(name))
-          name = m[0]
-          moveDir(dir, dir.parentDir() / name)
+          let pattern = re("(.+?)(?:$|[-_](?i:mainline|classic|vanilla|classic_era|wrath|tbc|bcc|cata|wotlk|mop))", flags = {reIgnoreCase})
+          var match: array[2, string]
+          discard find(cstring(name), pattern, match, 0, len(name))
+          moveDir(dir, dir.parentDir() / match[0])
         return true
   return false
 
