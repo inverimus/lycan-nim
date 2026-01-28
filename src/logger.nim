@@ -17,7 +17,7 @@ proc logInit*(level: LogLevel) =
     logChannel.open()
 
 proc time(): string =
-  return now().format("HH:mm:ss'.'fff")
+  now().format("HH:mm:ss'.'fff")
 
 proc writeLog(msg: string) =
   let logFileName = getCurrentDir() / "hearthsync.log"
