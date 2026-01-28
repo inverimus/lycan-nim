@@ -206,7 +206,8 @@ proc update(addon: Addon) {.gcsafe.} =
     addon.download(json)
     addon.setAddonState(Installing)
     addon.unzip()
-    addon.createBackup()
+    if addon.config.backupEnabled:
+      addon.createBackup()
     addon.moveDirs()
     if addon.action == Reinstall:
       addon.setAddonState(FinishedInstalled)
@@ -226,7 +227,8 @@ proc install(addon: Addon) {.gcsafe.} =
   addon.download(json)
   addon.setAddonState(Installing)
   addon.unzip()
-  addon.createBackup()
+  if addon.config.backupEnabled:
+    addon.createBackup()
   addon.moveDirs()
   addon.setAddonState(FinishedInstalled)
 
