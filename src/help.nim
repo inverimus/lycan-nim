@@ -45,6 +45,8 @@ proc displayHelp*(args: seq[string] = @[]) =
     t.write(6, "On or off enables or disables backups respectively.\n")
     t.write(4, fgCyan, "github <token>\n")
     t.write(6, fgWhite, "Sets a github personal access token. This may be required to fix 403 forbidden responses for too may requests.\n")
+    t.write(4, fgCyan, "path [wow directory]\n")
+    t.write(6, fgWhite, "Sets the WoW directory if you want to run hearthsync from a different directory.\n")
 
   of "l", "list":
     t.write(2, fgCyan, "l, list [options]", "\n\n")
