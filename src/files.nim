@@ -123,11 +123,13 @@ proc getAddonDirs(addon: Addon): seq[string] {.gcsafe.} =
     if not tocDir(current):
       log(&"{addon.getName()}: extractDir contains no toc files, collecting subdirectories")
       let subdirs = collect(for kind, dir in walkDir(current): (if kind == pcDir: dir))
-      assert len(subdirs) != 0 
+      assert subdirs.len != 0
       current = subdirs[0]
     else:
-      if firstPass: return @[current]
-      else: return collect(for kind, dir in walkDir(parentDir(current)): (if kind == pcDir: dir))
+      if firstPass:
+        return @[current]
+      else:
+        return collect(for kind, dir in walkDir(parentDir(current)): (if kind == pcDir: dir))
     firstPass = false
 
 proc getBackupFiles*(addon: Addon): seq[string] {.gcsafe.} = 
@@ -143,10 +145,10 @@ proc getBackupFiles*(addon: Addon): seq[string] {.gcsafe.} =
   backups.sort((a, b) => int(getCreationTime(a).toUnix() - getCreationTime(b).toUnix()))
   return backups
 
-proc removeAddonFiles*(addon: Addon, installDir: string, removeAllBackups: bool) {.gcsafe.} =
+proc removeAddonFiles*(addon: Addon, removeBackups: bool = false) {.gcsafe.} =
   for dir in addon.dirs:
-    removeDir(installDir / dir)
-  if removeAllBackups:
+    removeDir(addon.config.installDir / dir)
+  if removeBackups:
     var backups = addon.getBackupFiles()
     for file in backups:
       removeFile(file)
@@ -155,7 +157,7 @@ proc setIdAndCleanup(addon: Addon) {.gcsafe.} =
   for a in addon.config.addons:
     if a == addon:
       addon.id = a.id
-      a.removeAddonFiles(addon.config.installDir, removeAllBackups = false)
+      a.removeAddonFiles()
       break
 
 proc moveDirs*(addon: Addon) {.gcsafe.} =

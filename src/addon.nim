@@ -231,7 +231,7 @@ proc install(addon: Addon) {.gcsafe.} =
   addon.setAddonState(FinishedInstalled)
 
 proc uninstall(addon: Addon) =
-  addon.removeAddonFiles(addon.config.installDir, removeAllBackups = true)
+  addon.removeAddonFiles(removeBackups = true)
   addon.setAddonState(Removed)
 
 proc pin(addon: Addon) =
