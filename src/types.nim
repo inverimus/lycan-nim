@@ -46,6 +46,7 @@ type
   Config* = ref object
     tempDir*: string
     installDir*: string
+    wowDir*: string
     backupEnabled*: bool
     backupDir*: string
     addonJsonFile*: string

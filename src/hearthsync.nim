@@ -53,8 +53,7 @@ proc changeConfig(args: seq[string]) =
     of "github":
       setGithubToken(args[i + 1]); break
     else:
-      t.write(0, fgRed, styleBright, "Error: ", fgWhite, "Unrecognized option ",
-          fgCyan, item, "\n", resetStyle)
+      t.write(0, fgRed, styleBright, "Error: ", fgWhite, "Unrecognized option ", fgCyan, item, "\n", resetStyle)
       displayHelp(@["config"])
   writeConfig(configData)
   quit()
@@ -120,10 +119,13 @@ proc parseArgs(): (tuple[action: Action, args: seq[string]]) =
 
 
 proc main() {.inline.} =
+  let (action, args) = parseArgs()
+  if action == Setup and args.contains("path"):
+    setPath(args)
+  
   configData = loadConfig()
   logInit(configData.logLevel)
-
-  let (action, args) = parseArgs()
+  
   let t = configData.term
   var
     addons: seq[Addon]

@@ -67,6 +67,7 @@ proc writeConfig*(config: Config) =
   json["backupDir"] = %config.backupDir
   json["githubToken"] = %config.githubToken
   json["logLevel"] = %config.logLevel
+  json["wowDir"] = %config.wowDir
   
   try:
     writeFile(configPath, pretty(json))
@@ -79,22 +80,30 @@ proc loadConfig*(): Config =
   result.tempDir = getTempDir() / "hearthsync"
   createDir(result.tempDir)
   result.term = termInit()
-  result.addonJsonFile = getCurrentDir() / "WTF" / "hearthsync.addons"
-  result.installDir = getCurrentDir() / "Interface" / "AddOns"
   
   var configJson: JsonNode
   try:
     configJson = readFile(configPath).parseJson()
   except:
-    result.logLevel = Debug
-    result.backupEnabled = true
-    result.backupDir = getCurrentDir() / "Interface" / "hearthsync_backup"
-    result.githubToken = ""
-    result.addons = @[]
-    writeConfig(result)
-    log(&"{configPath} not found, defaults loaded", Info)
-    return
+    if dirExists(getCurrentDir() / "WTF"):
+      result.logLevel = Debug
+      result.backupEnabled = true
+      result.wowDir = getCurrentDir()
+      result.backupDir = getCurrentDir() / "Interface" / "hearthsync_backup"
+      result.addonJsonFile = getCurrentDir() / "WTF" / "hearthsync.addons"
+      result.installDir = getCurrentDir() / "Interface" / "AddOns"
+      result.githubToken = ""
+      result.addons = @[]
+      writeConfig(result)
+      log(&"{configPath} not found, defaults loaded", Info)
+      return
+    else:
+      result.term.write(0, fgRed, styleBright, "Error: ", fgWhite, &"Did not find WTF directory. Run this program from the root of the game directory or set the wow path: {getAppFilename().lastPathPart()} config path <path>\n", resetStyle)
+      quit(1)
 
+  result.wowDir = configJson["wowDir"].getStr()
+  result.addonJsonFile = result.wowDir / "WTF" / "hearthsync.addons"
+  result.installDir = result.wowDir / "Interface" / "AddOns"
   result.logLevel = parseEnum[LogLevel](configJson["logLevel"].getStr())
   result.backupEnabled = configJson["backupEnabled"].getBool()
   result.backupDir = configJson["backupDir"].getStr()
@@ -157,3 +166,22 @@ proc setLogLevel*(arg: string) =
     configData.term.write(2, fgWhite, "Valid logging levels are off, info, debug, warn, and fatal\n", resetStyle)
     quit(1)
   configData.logLevel = newLevel
+
+proc setPath*(args: seq[string]) =
+  let path = args[^1].strip(chars = {'\'', '"'}).normalizePathEnd()
+  if not dirExists(path):
+    stdout.write("Error: Path provided does not exist:\n  ",path, "\n")
+    quit(1)
+  configData = Config()
+  configData.logLevel = Debug
+  configData.backupEnabled = true
+  configData.backupDir = path / "Interface" / "hearthsync_backup"
+  configData.addonJsonFile = path / "WTF" / "hearthsync.addons"
+  configData.installDir = path / "Interface" / "AddOns"
+  configData.wowDir = path
+  configData.githubToken = ""
+  configData.addons = @[]
+  writeConfig(configData)
+  configData = loadConfig()
+  configData.term.write(0, fgWhite, "Config set. WoW found at: ", fgCyan, path, "\n", resetStyle)
+  quit(0)
