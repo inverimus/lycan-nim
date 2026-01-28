@@ -63,12 +63,12 @@ proc writeDownloadedFile(addon: Addon, response: Response) {.gcsafe.} =
   try:
     file = open(addon.filename, fmWrite)
   except Exception as e:
-    addon.setAddonState(Failed, &"Download failed, problem opening file {addon.filename}", e)
+    addon.setAddonState(Failed, &"Download failed, error opening file {addon.filename}", e)
     return
   try:
     system.write(file, response.body)
   except Exception as e:
-    addon.setAddonState(Failed, &"Download failed, error writing to file {addon.filename}", e)
+    addon.setAddonState(Failed, &"Download failed, error writing file {addon.filename}", e)
   file.close()
 
 proc download*(addon: Addon, json: JsonNode) {.gcsafe.} =
