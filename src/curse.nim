@@ -1,7 +1,6 @@
 import std/enumerate
 import std/json
 import std/jsonutils
-import std/re
 import std/sequtils
 import std/strformat
 import std/strutils
@@ -16,10 +15,12 @@ when not defined(release):
   debugLog("curse.nim")
 
 proc nameCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
-  result = json["fileName"].getStr()
-  let pos = result.find(re"[-_.]")
-  if pos != -1:
-    result = result[0 ..< pos]
+  let name = json["fileName"].getStr().replace(addon.version, "").strip(chars = {' ', '_', '-', '.'})
+  result = name.split('-')[0]
+  if result.endsWith(".zip"):
+    result = name.split('_')[0]
+  if result.endsWith(".zip"):
+    result = name.split('.')[0]
 
 proc versionCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
   try:
