@@ -22,8 +22,8 @@ proc validProject(project: string, kind: AddonKind): bool =
   of Github:        return project.split("/").len == 2
   of Wago, Zremax:  return not project.contains("/")
   of Gitlab:        return project.split("/").len in [2, 3]
-  else:             return false
- 
+  of GithubRepo:    return false # unused
+
 proc addonFromUrl(url: string): Option[Addon] =
   let t = configData.term
   var urlmatch: array[2, string]
