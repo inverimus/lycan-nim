@@ -1,17 +1,14 @@
-import std/enumerate
 import std/httpclient
 import std/json
 import std/jsonutils
-import std/strformat
 import std/strutils
-import std/terminal
 import std/times
 import std/xmltree
 
 import pkg/htmlparser
 
 import types
-import term
+import select
 
 when not defined(release):
   import logger
@@ -46,25 +43,7 @@ proc extractJsonZremax*(addon: Addon, response: Response): JsonNode {.gcsafe.} =
   json["expansions"] = %expansions
   return json
 
-proc userSelectGameVersion(addon: Addon, options: seq[string]): string {.gcsafe.} =
-  let t = addon.config.term
-  var selected = 1
-  for _ in 0 ..< options.len:
-    t.addLine()
-  while true:
-    for (i, option) in enumerate(options):
-      if selected == i + 1:
-        t.write(16, addon.line + i + 1, bgWhite, fgBlack, &"{i + 1}: {option}", resetStyle)
-      else:
-        t.write(16, addon.line + i + 1, bgBlack, fgWhite, &"{i + 1}: {option}", resetStyle)
-    let newSelected = handleSelection(options.len, selected)
-    if newSelected == selected:
-      t.clear(addon.line .. addon.line + options.len)
-      return options[selected - 1]
-    elif newSelected != -1:
-      selected = newSelected
-
 proc chooseDownloadUrlZremax*(addon: Addon, json: JsonNode) {.gcsafe.} =
   var expansions: seq[string]
   expansions.fromJson(json["expansions"])
-  addon.gameVersion = userSelectGameVersion(addon, expansions).toLowerAscii()
+  addon.gameVersion = expansions[addon.userSelect(expansions)].toLowerAscii()
