@@ -201,8 +201,8 @@ proc main() {.inline.} =
   processed &= processMessages()
   thr.joinThreads()
 
+  t.addLine()
   if action == List:
-    t.addLine()
     quit(0)
 
   failed = processed.filterIt(it.state == DoneFailed)
@@ -221,7 +221,6 @@ proc main() {.inline.} =
   writeAddons(final)
   writeConfig(configData)
 
-  t.addLine()
   for addon in failed:
     t.write(0, fgRed, styleBright, &"\nError: ", fgCyan, addon.getName(), "\n", resetStyle)
     t.write(4, fgWhite, addon.errorMsg, "\n", resetStyle)
