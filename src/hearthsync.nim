@@ -212,6 +212,7 @@ proc main() {.inline.} =
   of Install:
     assignIds(success & configData.addons)
     success.apply((a: Addon) => t.write(1, a.line, fgBlue, &"{a.id:<3}", resetStyle))
+    t.addLine()
   else:
     discard
 
