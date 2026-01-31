@@ -179,7 +179,7 @@ proc moveDirs*(addon: Addon) {.gcsafe.} =
 proc createBackup*(addon: Addon) {.gcsafe.} =
   if addon.state == Failed: return
   let backups = addon.getBackupFiles()
-  var name = $addon.kind & addon.project & "&V=" & addon.version & ".zip"
+  var name = &"{addon.kind}{addon.project}&V={addon.version}.zip"
   for c in invalidFilenameChars:
     name = name.replace(c, '-')
   createDir(addon.config.backupDir)
