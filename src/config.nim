@@ -80,6 +80,7 @@ proc loadConfig*(): Config =
   result.tempDir = getTempDir() / "hearthsync"
   createDir(result.tempDir)
   result.term = termInit()
+  result.time = now()
   
   var configJson: JsonNode
   try:

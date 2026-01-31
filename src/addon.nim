@@ -174,6 +174,7 @@ proc extractJson(addon: Addon): JsonNode {.gcsafe.} =
       json = parseJson(response.body)
     except Exception as e:
       addon.setAddonState(Failed, "JSON parsing error.", e)
+  
   case addon.kind:
   of Curse:
     if addon.action == Install:
@@ -206,7 +207,7 @@ proc update(addon: Addon) {.gcsafe.} =
   addon.setAddonState(Parsing)
   addon.setVersion(json)
   if addon.action == Reinstall or addon.version != addon.startVersion:
-    addon.time = now()
+    addon.time = addon.config.time
     addon.setDownloadUrl(json)
     addon.setName(json)
     addon.setAddonState(Downloading)
