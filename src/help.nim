@@ -92,6 +92,8 @@ proc displayHelp*(args: seq[string] = @[]) =
     t.write(30, fgWhite, "Force a reinstall of all addons. Can be used to restore from an existing hearthsync.addons file.", "\n")
     t.write(5, true, fgCyan, "restore <id1> <id2> ...")
     t.write(30, fgWhite, "Restore addons to the version prior to last update if backups were enabled when installed.", "\n")
+    t.write(5, true, fgCyan, "revert")
+    t.write(30, fgWhite, "Restore all addons to the version prior to last update if backups were enabled when installed.", "\n")
     t.write(5, true, fgCyan, "unpin <id1> <id2> ...")
     t.write(30, fgWhite, "Unpin addon to restore updates.", "\n")
     t.write(2, true, fgCyan, "u, update")
