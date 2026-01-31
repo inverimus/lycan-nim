@@ -3,7 +3,6 @@ import std/httpclient
 import std/json
 import std/options
 import std/os
-import std/re
 import std/sequtils
 import std/strformat
 import std/strutils
