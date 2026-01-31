@@ -22,8 +22,12 @@ proc nameCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
 
 proc versionCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
   try:
+    debugLog(json.pretty())
     result = json["displayName"].getStr()
-    result = result.replace(addon.nameCurse(json), "").replace(".zip", "")
+    result = result.replace(".zip", "")
+    let lastSep = result.rfind({' ', '-', '_'})
+    if lastSep != -1:
+      result = result[lastSep + 1 .. ^1]
     result = result.strip(chars = {' ', '_', '-', '.'})
   except KeyError:
     result = json["dateModified"].getStr()
