@@ -297,20 +297,14 @@ proc restore*(addon: Addon) =
 
 proc workQueue*(addon: Addon) {.thread.} =
   case addon.action
-  of Update, Reinstall:
-    addon.update()
-  of Install: 
-    addon.install()
-  of Remove: 
-    addon.uninstall()
-  of Pin:
-    addon.pin()
-  of Unpin:
-    addon.unpin()
-  of Restore:
-    addon.restore()
-  of Name:
-    addon.setAddonState(Renamed)
+  of Update:    addon.update()
+  of Reinstall: addon.update()
+  of Install:   addon.install()
+  of Remove:    addon.uninstall()
+  of Pin:       addon.pin()
+  of Unpin:     addon.unpin()
+  of Restore:   addon.restore()
+  of Name:      addon.setAddonState(Renamed)
   else: discard
   addon.state = if addon.state == Failed: DoneFailed else: Done
   addonChannel.send(addon)
