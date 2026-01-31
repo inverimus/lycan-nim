@@ -62,11 +62,11 @@ proc setName(addon: Addon, json: JsonNode) {.gcsafe.} =
   if addon.state == Failed: return
   case addon.kind
   of Curse:  addon.name = addon.nameCurse(json)
-  of Tukui:  addon.name = json["name"].getStr()
   of Wowint: addon.name = json["UIName"].getStr()
   of Wago:   addon.name = json["props"]["addon"]["display_name"].getStr()
-  of Zremax: addon.name = json["name"].getStr()
-  of Github, GithubRepo, Gitlab, Legacy: 
+  of Tukui, Legacy, Zremax: 
+    addon.name = json["name"].getStr()
+  of Github, GithubRepo, Gitlab: 
     addon.name = addon.project.split('/')[^1]
 
 proc setVersion(addon: Addon, json: JsonNode) {.gcsafe.} =
