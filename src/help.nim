@@ -46,6 +46,7 @@ proc displayHelp*(args: seq[string] = @[]) =
     t.write(3, fgBlue, "Legacy-wow:", "\n")
     t.write(4, fgWhite, &"{appFilename} install https://legacy-wow.com/cata-addons/recount/", "\n")
     t.write(4, &"{appFilename} install legacy-wow:cata-addons/recount", "\n")
+    t.write(6, fgGreen, "⬑", fgYellow, "Legacy-wow addons do not update. Use another source if the addon is being actively updated.", "\n")
     
   of "c", "config":
     t.write(2, fgCyan, "c, config [options]", "\n\n")
