@@ -71,7 +71,7 @@ proc processMessages(): seq[Addon] =
       else:
         addons = addons.filterIt(it != addon)
         addons.add(addon)
-        maxName = addons.mapIt(it.getName().len).max + 2
+        maxName = addons.mapIt(it.getTruncatedName().len).max + 2
         maxVersion = addons.mapIt(it.getVersion().len).max + 2
         maxKind = addons.mapIt(it.getKind().len).max + 2
         if addon.action == ListAll:

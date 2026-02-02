@@ -52,7 +52,7 @@ proc stateMessage*(addon: Addon, nameSpace, versionSpace, kindSpace, projectSpac
   
   t.write(fgBlue, alignLeft($addon.id, 3),
     stateColor, alignLeft($addon.state, stateSpace),
-    fgWhite, addon.getName().alignLeft(nameSpace), 
+    fgWhite, addon.getTruncatedName().alignLeft(nameSpace), 
     versionColor, addon.getVersion().alignLeft(versionSpace), 
     fgCyan, kind.alignLeft(kindSpace)
   )
