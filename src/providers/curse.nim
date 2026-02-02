@@ -13,6 +13,7 @@ when not defined(release):
   debugLog("curse.nim")
 
 proc nameCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
+  debugLog(json.pretty())
   let name = json["fileName"].getStr().replace(addon.version, "").strip(chars = {' ', '_', '-', '.'})
   result = name.split('-')[0]
   if result.endsWith(".zip"):
@@ -24,6 +25,11 @@ proc versionCurse*(addon: Addon, json: JsonNode): string {.gcsafe.} =
   try:
     result = json["displayName"].getStr()
     result = result.replace(".zip", "")
+    let i = result.find({'0'..'9'})
+    if i != -1:
+      result = result[i .. ^1]
+    else:
+      result = json["dateModified"].getStr()
   except KeyError:
     result = json["dateModified"].getStr()
 
