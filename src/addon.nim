@@ -244,10 +244,6 @@ proc uninstall(addon: Addon) =
   addon.removeAddonFiles(removeBackups = true)
   addon.setAddonState(Removed)
 
-proc list(addon: Addon) =
-  addon.setAddonState(Listed)
-  addon.setAddonState(Done)
-
 proc pin(addon: Addon) =
   addon.pinned = true
   addon.setAddonState(Pinned)
@@ -283,8 +279,6 @@ proc workQueue*(addon: Addon) {.thread.} =
   of Pin:       addon.pin()
   of Unpin:     addon.unpin()
   of Restore:   addon.restore()
-  of List:      addon.list()
-  of ListAll:   addon.list()
   of Name:      addon.setAddonState(Renamed)
   else: discard
   addon.state = if addon.state == Failed: DoneFailed else: Done

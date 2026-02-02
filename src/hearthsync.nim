@@ -16,7 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ]#
 
-import std/algorithm
 import std/os
 import std/parseopt
 import std/sequtils
@@ -24,7 +23,6 @@ import std/strformat
 import std/strutils
 import std/sugar
 import std/terminal
-import std/times
 
 import action
 import addon
@@ -73,10 +71,11 @@ proc processMessages(): seq[Addon] =
       else:
         addons = addons.filterIt(it != addon)
         addons.add(addon)
-        maxName = addons[addons.mapIt(it.getName().len).maxIndex()].getName().len + 2
-        maxVersion = addons[addons.mapIt(it.getVersion().len).maxIndex()].getVersion().len + 2
-        maxKind = addons[addons.mapIt(it.getKind().len).maxIndex()].getKind().len + 2
-        maxProject = addons[addons.mapIt(it.project.len).maxIndex()].project.len + 2
+        maxName = addons.mapIt(it.getName().len).max + 2
+        maxVersion = addons.mapIt(it.getVersion().len).max + 2
+        maxKind = addons.mapIt(it.getKind().len).max + 2
+        if addon.action == ListAll:
+          maxProject = addons.mapIt(it.project.len).max + 2
         for addon in addons:
           addon.stateMessage(maxName, maxVersion, maxKind, maxProject)
     else:
@@ -168,22 +167,15 @@ proc main() {.inline.} =
   of Name:
     addons.add(renameAddon(args))
   of List, ListAll:
-    addons = configData.addons
-    if addons.len == 0:
-      t.write(2, fgWhite, "No addons installed\n", resetStyle)
-      quit()
-    if "t" in args or "time" in args:
-      addons.sort((a, z) => int(a.time < z.time))
-    let listAll = "a" in args or "all" in args
-    for addon in addons:
-      addon.setAction(if listAll: ListAll else: List)
+    configData.addons.listAddons(args)
+    quit()
   of Setup:
     changeConfig(args)
   of Help:
     displayHelp(args)
 
-  for i, addon in addons:
-    addon.line = i
+  for i, add in addons:
+    add.line = i
 
   addonChannel.open()
   var thr = newSeq[Thread[Addon]](len = addons.len)
@@ -206,7 +198,6 @@ proc main() {.inline.} =
   processed &= processMessages()
   thr.joinThreads()
 
-  
   if action == List:
     t.addLine()
     quit(0)
@@ -231,6 +222,7 @@ proc main() {.inline.} =
   for addon in failed:
     t.write(0, fgRed, styleBright, &"\nError: ", fgCyan, addon.getName(), "\n", resetStyle)
     t.write(4, fgWhite, addon.errorMsg, "\n", resetStyle)
-
+    
 when isMainModule:
   main()
+

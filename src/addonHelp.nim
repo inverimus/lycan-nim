@@ -22,11 +22,17 @@ proc getVersion*(addon: Addon): string =
     return addon.version.replace(addon.name, "").strip(chars = {' ', '_', '-', '.'})
 
 proc getName*(addon: Addon): string =
-  if addon.overrideName.isSome: 
+  if addon.overrideName.isSome:
     return addon.overrideName.get
   if addon.name.isEmptyOrWhitespace:
     return $addon.kind & ':' & addon.project
   return addon.name
+
+proc getTruncatedName*(addon: Addon): string =
+  let name = getName(addon)
+  if name.len > 40:
+    return name[0 ..< 37].strip(chars = PunctuationChars) & "..."
+  return name
 
 proc getKind*(addon: Addon): string =
   case addon.kind

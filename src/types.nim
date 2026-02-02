@@ -33,7 +33,6 @@ type
     Renamed = "Renamed"
     Done = "Done"
     DoneFailed = "Failed"
-    Listed = "Listed"
   
   AddonKind* = enum
     Github, GithubRepo, Gitlab, Tukui, Wowint, Curse, Wago, Zremax, Legacy
@@ -86,3 +85,4 @@ type
     x*: int
     y*: int
     yMax*: int
+    width*: int

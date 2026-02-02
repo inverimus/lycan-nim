@@ -82,7 +82,8 @@ proc moveTo(t: Term, x, y: int, erase: bool) =
       
   if erase or newLine:
     t.f.eraseLine()
-    t.f.cursorForward(x)
+    if x != 0:
+      t.f.cursorForward(x)
   else:
     let xOffset = t.x - x
     if xOffset > 0:
@@ -121,6 +122,7 @@ proc write*(t: Term, x, y: int, s: string, erase: bool) =
 proc exitTerm(t: Term): proc() =
   return proc() =
     resetAttributes()
+    t.f.write("\e[?7h") # Enable wrapping
     showCursor()
 
 proc addLine*(t: Term) =
@@ -133,9 +135,11 @@ proc clear*(t: Term, range: HSlice[int, int]) =
 proc termInit*(f: File = stdout): Term =
   enableTrueColors()
   hideCursor()
+  f.write("\e[?7l") # Disable wrapping
   result = new(Term)
   result.f = f
   result.trueColor = isTrueColorSupported()
+  result.width = terminalWidth()
   let exit = exitTerm(result)
   exitprocs.addExitProc(exit)
 
