@@ -60,7 +60,6 @@ proc processMessages(): seq[Addon] =
     maxName {.global.} = 0
     maxVersion {.global.} = 0
     maxKind {.global.} = 0
-    maxProject {.global.} = 0
     addons {.global.}: seq[Addon]
   while true:
     let (ok, addon) = addonChannel.tryRecv()
