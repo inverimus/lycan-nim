@@ -164,7 +164,7 @@ proc main() {.inline.} =
       addons.add(addon)
   of Name:
     addons.add(renameAddon(args))
-  of List, ListAll:
+  of List:
     configData.addons.listAddons(args)
     quit()
   of Setup:
